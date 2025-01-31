@@ -1,3 +1,11 @@
+---
+
+layout: default
+title: MoSe2
+permalink: /Knowledge_Network_project/
+
+---
+
 # MoSe2 #
 
 ---
