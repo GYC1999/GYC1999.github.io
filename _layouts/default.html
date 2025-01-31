@@ -3,34 +3,32 @@
 
   {% include head.html %}
   <style type="text/css">
-    a {TEXT-DECORATION:none}
+    a {color:#000000;TEXT-DECORATION:none}
   </style>
 
   <body>
-
-    <div class="header" style="background-color:#EEEEEE">
-      <a href="index.html"><font size="3">Yuchen Gao</font></a>
-    </div>
-    <hr>
-
     <div class="page-content">
       <table border="0">
-        <td valign=top style="background-color:#AAAAAA;width:350px;">
+        <tr style="background-color:#EEEEEE">
+          <a href="index.html" style="font-size:3"><font size="3">Yuchen Gao</font></a>
+          <hr>
+        </tr>
+        <tr>
+        <td valign=top style="background-color:#DDDDDD;width:300px;">
           <b>菜单<b><br>
-          <a href="About_me.html">About me</a><br>
+          <a href="About_me.html">About Me</a><br>
           <a href="About_me.html">News</a><br>
           <a href="About_me.html">Knowledge Network Project</a><br>
         </td>
         <td valign=top>
           {{ content }}
         </td>
+        </tr>
+        <tr style="background-color:#EEEEEE">
+          <hr>
+          <a href="index.html">Yuchen Gao</a>
+        </tr>
       </table>
     </div>
-    <hr>
-    <div class="header" style="background-color:#EEEEEE">
-      <a href="index.html"><font size="1">Yuchen Gao</font></a>
-    </div>    
-
   </body>
-
 </html>
