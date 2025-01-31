@@ -10,14 +10,17 @@
     </div>
 
     <div class="page-content">
-      <div id="menu" style="background-color:FFFFEE;width:200px;float:left;">
-        <b>菜单<b><br>
-        <a href="About_me.html">About me</a><br>
-        <a href="About_me.html">News</a><br>
-        <a href="About_me.html">Knowledge Network Project</a><br>
-      <div class="content" style="background-color:FFFFFF;float:left;">
-        {{ content }}
-      </div>
+      <table border="0">
+        <td style="background-color:FFFFEE;width:200px;">
+          <b>菜单<b><br>
+          <a href="About_me.html">About me</a><br>
+          <a href="About_me.html">News</a><br>
+          <a href="About_me.html">Knowledge Network Project</a><br>
+        </td>
+        <td>
+          {{ content }}
+        </td>
+      </table>
     </div>
 
     {% include footer.html %}
