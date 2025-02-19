@@ -1,0 +1,408 @@
+
+
+<!---------------------------------------------------------------->
+
+<head>
+    <meta charset="utf-8">
+  </head>
+  
+  <!---------------------------------------------------------------->
+  
+  <script type="text/x-mathjax-config">
+  
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'] ],
+        processEscapes: true
+      }
+    });
+  </script>
+  
+  <!---------------------------------------------------------------->
+  
+  <script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+  
+  <!---------------------------------------------------------------->
+  
+  <body>
+    <div class="header" style="height: 100px;background-color: skyblue;">
+      <a href="Knowledge_Network_Project.html" style="text-decoration-line: none;"><h1>Knowledge Network Project</h1></a> by GYC
+    </div>
+    <div class="home">
+  
+      <h1>Slave Particle method</h1>
+      <p></p>
+      <hr><br>
+      <h2>U(1) slave spin mean field theory</h2>
+      <p>
+        The original theory is from <a href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.86.085104">"U(1) slave spin mean field"</a>. Here the full derivation of the theory is presented below.
+      </p>
+      <h3>Hamiltonian and slave spin operator</h3>
+      <p>
+        The slave spin mean field theory deal with Hubbard model and periodic Anderson model. The one-band Hamiltonian is:
+        $$H=H_0+H_1$$
+        $$H_0=H_d+H_c+H_v$$
+        where
+        $$H_d=\sum_{ij\sigma}t_{ij}(d_{i\sigma}^+d_{j\sigma}+h.c.)-\mu\sum_{i\sigma}d_{i\sigma}^+d_{i\sigma}$$
+        $$H_c=\sum_{ij\alpha\beta\sigma}t_{ij}^{\alpha\beta}(c_{i\alpha\sigma}^+c_{j\beta\sigma}+h.c.)+\sum_{i\alpha\sigma}(\Delta_\alpha-\mu)c_{i\sigma}^+c_{i\sigma}$$
+        $$H_v=\sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha(d_{i\sigma}^+c_{j\alpha\sigma}+h.c.)$$
+        and
+        $$H_1=\frac{U}{2}\sum_i(n_{di\uparrow}+n_{di\downarrow}-1)^2$$
+        Introduce the slave spin operator:
+        $$d_{i\sigma}^+=f_{i\sigma}^+o_{i\sigma}^+$$
+        where
+        $$o_{i\sigma}^+=P_{i\sigma}^+S_{i\sigma}^+P_{i\sigma}^-$$
+        $$P_{i\sigma}^\pm=\frac{1}{\sqrt{\frac{1}{2}\pm S_\sigma^z}}$$
+        The constraint
+        $$S_{i\sigma}^z+\frac{1}{2}=n_{i\sigma}^f$$
+      </p>
+      <h3>Mean field approximation and other approximations</h3>
+      <p>
+        The mean field approximation:
+        $$f_{i\sigma}^+o_{i\sigma}^+o_{i\sigma}f_{i\sigma} \approx \langle f_{i\sigma}^+f_{i\sigma}\rangle o_{i\sigma}^+o_{i\sigma}+ f_{i\sigma}^+f_{i\sigma} \langle o_{i\sigma}^+o_{i\sigma} \rangle+const.$$
+        $$f_{i\sigma}^+o_{i\sigma}^+c_{j\alpha\sigma} \approx \langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle o_{i\sigma}^++  f_{i\sigma}^+c_{j\alpha\sigma} \langle o_{i\sigma}^+\rangle+const.$$
+        Further approximation on the $o$ operator (omit the $\sigma$ lable):
+        $$ \langle o_io_j^+ \rangle\approx \langle o_i\rangle\langle o_j^+ \rangle$$
+        $$  o_io_j^+ \approx \langle o_i\rangle o_j^+ +o_i\langle o_j^+ \rangle-\langle o_i\rangle\langle o_j^+ \rangle$$
+        The saddle point approximation of operator $o$:
+        $$o^+=P^+S^+P^-$$
+        use
+        $$P^\pm=\frac{1}{\sqrt{\frac{1}{2}\pm S_\sigma^z}}\approx \frac{1}{\sqrt{\frac{1}{2}\pm \langle S^z \rangle}}\left(1-\frac{\pm(S^z-\langle S^z\rangle)}{1\pm 2 \langle S^z\rangle}\right)$$
+        $$S^+\approx\langle S^+ \rangle+S^+-\langle S^+ \rangle$$
+        define $\langle P^\pm \rangle=\frac{1}{\sqrt{\frac{1}{2}\pm \langle S_\sigma^z\rangle}}$
+        then:
+        $$P^\pm \approx \langle P^\pm \rangle +\langle P^\pm \rangle\left(-\frac{\pm(S^z-\langle S^z\rangle)}{1\pm 2 \langle S^z\rangle}\right):=\langle P^\pm \rangle +\langle P^\pm \rangle \delta^\pm$$
+        finally
+        $$
+        \begin{aligned}
+          o^+ & =(\langle P^+ \rangle +\langle P^+ \rangle \delta^+)(\langle S^+ \rangle+S^+-\langle S^+ \rangle)(\langle P^- \rangle +\langle P^- \rangle \delta^-) \\
+          & \approx \langle P^+ \rangle\langle S^+ \rangle\langle P^- \rangle+\langle P^+ \rangle\langle P^- \rangle(S^+-\langle S^+ \rangle)+\langle P^+ \rangle\langle S^+\rangle\langle P^- \rangle (\delta^++\delta^-)\\
+          & = \langle P^+ \rangle S^+\langle P^- \rangle +\langle P^+ \rangle\langle S^+\rangle\langle P^- \rangle (\delta^++\delta^-) \\
+          & = \langle P^+ \rangle S^+\langle P^- \rangle +\langle P^+ \rangle\langle S^+\rangle\langle P^- \rangle \frac{1}{2} (S^z-\langle S^z \rangle)\left(\frac{-1}{n}+\frac{1}{1-n}\right)
+        \end{aligned}
+        $$
+        where
+        $$n=\langle S^z \rangle+ \frac{1}{2}$$
+        define $O^+=\langle P^+ \rangle S^+\langle P^-\rangle$, then:
+        $$o^+\approx O^+ +\langle O^+\rangle\frac{1}{2} (2S^z-2\langle S^z \rangle)\frac{n-1/2}{n(1-n)}=O^+ +\langle O^+\rangle\eta (2S^z-2n+1)$$
+        where
+        $$\eta=\frac{1}{2}\frac{n-1/2}{n(1-n)}$$
+      </p>
+      <h3>Hamiltonian expressed by c, f and O operators</h3>
+      <p>
+        $$
+          \begin{align}
+          H_d & = \sum_{ij\sigma}t_{ij}(d_{i\sigma}^+d_{j\sigma}+h.c.)-\mu\sum_{i\sigma}d_{i\sigma}^+d_{i\sigma} \\
+          & = \sum_{ij\sigma}t_{ij}(f_{i\sigma}^+o_{i\sigma}^+o_{j\sigma}f_{j\sigma}+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          & \approx \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle o_{i\sigma}^+o_{j\sigma}+f_{i\sigma}^+f_{j\sigma}\langle o_{i\sigma}^+o_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          & \approx \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle o_{i\sigma}^+\rangle o_{j\sigma}+o_{i\sigma}^+\langle o_{j\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle o_{i\sigma}^+\rangle\langle o_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          & \approx \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle (O_{j\sigma}+\langle O_{j\sigma}\rangle\eta_{j\sigma} (2S^z_{j\sigma}-2n_{j\sigma}+1))+(O_{i\sigma}^++\langle O_{i\sigma}^+\rangle\eta_{i\sigma} (2S^z_{i\sigma}-2n_{i\sigma}+1))\langle O_{j\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{i\sigma}^+\rangle\langle O_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          \end{align}
+        $$
+        Remove the c-number terms
+        $$
+          \begin{align}
+          H_d & \approx \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle (O_{j\sigma}+\langle O_{j\sigma}\rangle\eta_{j\sigma} (2S^z_{j\sigma}-2n_{j\sigma}+1))+(O_{i\sigma}^++\langle O_{i\sigma}^+\rangle\eta_{i\sigma} (2S^z_{i\sigma}-2n_{i\sigma}+1))\langle O_{j\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{i\sigma}^+\rangle\langle O_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          & = \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle (O_{j\sigma}+\langle O_{j\sigma}\rangle\eta_{j\sigma} (2S^z_{j\sigma}+1))+(O_{i\sigma}^++\langle O_{i\sigma}^+\rangle\eta_{i\sigma} (2S^z_{i\sigma}+1))\langle O_{j\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{i\sigma}^+\rangle\langle O_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          & = \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle (O_{j\sigma}+\langle O_{j\sigma}\rangle2\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma})+(O_{i\sigma}^++\langle O_{i\sigma}^+\rangle2\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma})\langle O_{j\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{i\sigma}^+\rangle\langle O_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          & = \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle O_{j\sigma}+O_{i\sigma}^+\langle O_{j\sigma}\rangle)+h.c.) + \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle \langle O_{j\sigma}\rangle2\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma}+\langle O_{i\sigma}^+\rangle2\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma}\langle O_{j\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{i\sigma}^+\rangle\langle O_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+          \end{align}
+        $$
+        By assuming the $O$ operator and $\eta$ are independent with the position, and using $t_{ij}=t_{ji}$ we have:
+        $$
+        \begin{align}
+        H_d & \approx  \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle O_{j\sigma}+O_{i\sigma}^+\langle O_{j\sigma}\rangle)+h.c.) + \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{i\sigma}^+\rangle \langle O_{j\sigma}\rangle2\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma}+\langle O_{i\sigma}^+\rangle2\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma}\langle O_{j\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{i\sigma}^+\rangle\langle O_{j\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+
+        & = \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle)+h.c.) + \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle2\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma}+\langle O_{\sigma}^+\rangle2\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma}\langle O_{\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle+h.c.)-\mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+
+        & = \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle)+\langle f_{j\sigma}^+f_{i\sigma}\rangle (\langle O_{\sigma}\rangle O_{\sigma}^+ +O_{\sigma}\langle O_{\sigma}^+\rangle)) +\\
+        
+        &\quad\  \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle2\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma}+\langle O_{\sigma}^+\rangle2\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma}\langle O_{\sigma}\rangle)+\langle f_{j\sigma}^+f_{i\sigma}\rangle (\langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle2\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma}+\langle O_{\sigma}^+\rangle2\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma}\langle O_{\sigma}\rangle)+f_{i\sigma}^+f_{j\sigma}\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle+f_{j\sigma}^+f_{i\sigma}\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle)-\\
+        
+        &\quad\ \mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+
+        & = \sum_{ij\sigma}2t_{ij}\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle) +\\
+        
+        &\quad\  \sum_{ij\sigma}t_{ij}[\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle4\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma}+\langle O_{\sigma}^+\rangle4\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma}\langle O_{\sigma}\rangle)+2f_{i\sigma}^+f_{j\sigma}\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle]-\\
+        
+        &\quad\ \mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+
+        \end{align}
+        $$
+        The $H_v$
+        $$
+        \begin{align}
+          H_v & = \sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha(d_{i\sigma}^+c_{j\alpha\sigma}+h.c.) \\
+          & = \sum_{ij\sigma}t_{ij}(f_{i\sigma}^+o_{i\sigma}^+c_{j\alpha\sigma}+h.c.)\\
+          & \approx \sum_{ij\sigma}t_{ij}(\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle o_{i\sigma}^++  f_{i\sigma}^+c_{j\alpha\sigma} \langle o_{i\sigma}^+\rangle+h.c.) \\
+          & \approx \sum_{ij\sigma}t_{ij}[\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle [O_{i\sigma}^+ +\langle O_{i\sigma}^+\rangle\eta_{i\sigma} (2S_{i\sigma}^z-2n_{i\sigma}+1)]+  f_{i\sigma}^+c_{j\alpha\sigma} \langle O_{i\sigma}^+\rangle+h.c.] \\
+        
+        \end{align}
+        $$
+        Again by assuming the $O$ operator and $\eta$ are independent with the position, and using $t_{ij}=t_{ji}$ we have:
+        $$
+        \begin{align}
+          H_v & \approx \sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha[\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle [O_{i\sigma}^+ +\langle O_{i\sigma}^+\rangle\eta_{i\sigma} (2S_{i\sigma}^z-2n_{i\sigma}+1)]+  f_{i\sigma}^+c_{j\alpha\sigma} \langle O_{i\sigma}^+\rangle+h.c.] \\
+
+          & = \sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha[\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle [O_{\sigma}^+ +\langle O_{\sigma}^+\rangle 2\eta_{\sigma} f_{i\sigma}^+f_{i\sigma}]+  f_{i\sigma}^+c_{j\alpha\sigma} \langle O_{\sigma}^+\rangle+h.c.] \\
+
+          & = \sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha[\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle O_{\sigma}^+ + h.c.] + \sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha[\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle \langle O_{\sigma}^+\rangle 2\eta_{\sigma} f_{i\sigma}^+f_{i\sigma}+  f_{i\sigma}^+c_{j\alpha\sigma} \langle O_{\sigma}^+\rangle+h.c.] \\
+        
+        \end{align}
+        $$
+        And
+        $$
+          H_1=\frac{U}{2}\sum_i(n_{di\uparrow}+n_{di\downarrow}-1)^2=\frac{U}{2}\sum_i(S_{i\uparrow}^z+S_{i\downarrow}^z)^2
+        $$
+        $$
+          H_\lambda=\sum_{i\sigma}\lambda_{i\sigma}(f_{i\sigma}^+f_{i\sigma}-S_{i\sigma}^z-1/2)=\lambda_\sigma\sum_{i\sigma}(f_{i\sigma}^+f_{i\sigma}-S_{i\sigma}^z)
+        $$
+        The last step uses the homogeneity of the system, assuming the $\lambda$ field is a constant field.
+      </p>
+      <h3>Fourier transform</h3>
+      <p>
+        Fourier transform of the coefficients and operators are defined as:
+        $$t_k=\frac{1}{N}\sum_{ij}\exp(-ik(r_i-r_j)t_{ij});t_{ij}=\frac{1}{N}\sum_{k}\exp(ik(r_i-r_j)t_{k})$$
+        $$f_k^+=\frac{1}{\sqrt{N}}\sum_{i}\exp(ikr_i)f_{i}^+;f_{i}^+=\frac{1}{\sqrt{N}}\sum_{k}\exp(-ikr_i)f_{k}^+$$
+        Then
+        $$\sum_{ij}t_{ij}f_i^+f_j=\sum_kt_kf_k^+f_k$$
+        $$\sum_{i}f_i^+f_i=\sum_kf_k^+f_k$$
+        $$\sum_{ij}t_{ij}\langle f_i^+f_j\rangle f_j^+f_j=\frac{1}{N}\sum_{j} f_j^+f_j\sum_{ij'}t_{ij'}\langle f_i^+f_{j'}\rangle=\frac{1}{N}\sum_{k} f_k^+f_k\sum_{q}t_{q}\langle f_q^+f_{q}\rangle$$
+        $$\sum_{ij}t_{ij}\langle f_i^+f_j\rangle f_i^+f_i=\frac{1}{N}\sum_{i} f_i^+f_i\sum_{i'j}t_{i'j}\langle f_{i'}^+f_{j}\rangle=\frac{1}{N}\sum_{k} f_k^+f_k\sum_{q}t_{q}\langle f_q^+f_{q}\rangle$$
+      </p>
+      <p>
+        Finally the Hamiltonian:
+        $$
+        \begin{align}
+        H_d & \approx  \sum_{ij\sigma}2t_{ij}\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle) +\\
+        
+        &\quad\  \sum_{ij\sigma}t_{ij}[\langle f_{i\sigma}^+f_{j\sigma}\rangle (\langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle4\eta_{j\sigma} f_{j\sigma}^+f_{j\sigma}+\langle O_{\sigma}^+\rangle4\eta_{i\sigma} f_{i\sigma}^+f_{i\sigma}\langle O_{\sigma}\rangle))+2f_{i\sigma}^+f_{j\sigma}\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle]-\\
+        
+        &\quad\ \mu\sum_{i\sigma}f_{i\sigma}^+f_{i\sigma} \\
+
+        & = \sum_{k\sigma}2t_{k}\langle f_{k\sigma}^+f_{k\sigma}\rangle (\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle) +\\
+        
+        &\quad\  \sum_{k\sigma}[\frac{1}{N}\sum_{q}t_{q}\langle f_{q\sigma}^+f_{q\sigma}\rangle] \langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle8\eta_{\sigma} f_{k\sigma}^+f_{k\sigma} + \\
+        
+        &\quad\ \sum_{k\sigma}t_{k}2\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle f_{k\sigma}^+f_{k\sigma}-\\
+        
+        &\quad\ \mu\sum_{k\sigma}f_{k\sigma}^+f_{k\sigma} \\
+
+        \end{align}
+        $$
+
+        $$
+        \begin{align}
+          H_v & \approx \sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha[\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle O_{\sigma}^+ + h.c.] + \sum_{ij\alpha\sigma}V_{ij\sigma}^\alpha[\langle f_{i\sigma}^+c_{j\alpha\sigma}\rangle \langle O_{\sigma}^+\rangle 2\eta_{\sigma} f_{i\sigma}^+f_{i\sigma}+  f_{i\sigma}^+c_{j\alpha\sigma} \langle O_{\sigma}^+\rangle+h.c.] \\
+          & = \sum_{k\sigma\alpha}V_{k\sigma}^\alpha[\langle f_{k\sigma}^+c_{k\alpha\sigma}\rangle O_{\sigma}^+ + h.c.] + \sum_{k\sigma}[\frac{1}{N}\sum_{q\alpha}V_{q\sigma}^\alpha[\langle f_{q\sigma}^+c_{q\alpha\sigma}\rangle ]\langle O_{\sigma}^+\rangle 2\eta_{\sigma} f_{k\sigma}^+f_{k\sigma}+h.c.]+  \sum_{k\alpha\sigma}V_{k\sigma}^\alpha [f_{k\sigma}^+c_{k\alpha\sigma} \langle O_{\sigma}^+\rangle+h.c.] \\
+        
+        \end{align}
+        $$
+        $$
+        \begin{align}
+          H_f & = \sum_{k\sigma}[\frac{1}{N}\sum_{q}t_{q}\langle f_{q\sigma}^+f_{q\sigma}\rangle] \langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle8\eta_{\sigma} f_{k\sigma}^+f_{k\sigma} + 
+        
+          \sum_{k\sigma}t_{k}2\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle f_{k\sigma}^+f_{k\sigma}-
+          
+          \mu\sum_{k\sigma}f_{k\sigma}^+f_{k\sigma} \\
+
+          & + \sum_{k\sigma}[\frac{1}{N}\sum_{q\alpha}V_{q\sigma}^\alpha[\langle f_{q\sigma}^+c_{q\alpha\sigma}\rangle ]\langle O_{\sigma}^+\rangle 2\eta_{\sigma} f_{k\sigma}^+f_{k\sigma}+h.c.]+  \sum_{k\alpha\sigma}V_{k\sigma}^\alpha [f_{k\sigma}^+c_{k\alpha\sigma} \langle O_{\sigma}^+\rangle+h.c.] \\
+
+          & +H_c-\lambda_\sigma\sum_{k\sigma}f_{k\sigma}^+f_{k\sigma}\\
+
+          & = \sum_{k\sigma}2t_{k}\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle f_{k\sigma}^+f_{k\sigma} + \sum_{k\alpha\sigma}V_{k\sigma}^\alpha [f_{k\sigma}^+c_{k\alpha\sigma} \langle O_{\sigma}^+\rangle+h.c.]+H_c+(-\mu-\lambda_\sigma+\lambda_\sigma^0)\sum_{k\sigma}f_{k\sigma}^+f_{k\sigma}
+        \end{align}
+        $$
+        where $\lambda_\sigma^0=\frac{1}{N}\sum_{q}t_{q}\langle f_{q\sigma}^+f_{q\sigma}\rangle \langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle8\eta_{\sigma} + [\frac{1}{N}\sum_{q\alpha}V_{q\sigma}^\alpha\langle f_{q\sigma}^+c_{q\alpha\sigma}\rangle \langle O_{\sigma}^+\rangle 2\eta_{\sigma}+c.c.]$
+        $$
+          H_s=\sum_{k\sigma}2t_{k}\langle f_{k\sigma}^+f_{k\sigma}\rangle (\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle) + \sum_{k\sigma\alpha}V_{k\sigma}^\alpha[\langle f_{k\sigma}^+c_{k\alpha\sigma}\rangle O_{\sigma}^+ + h.c.] + \frac{U}{2}\sum_i(S_{i\uparrow}^z+S_{i\downarrow}^z)^2 + \lambda_\sigma\sum_{i\sigma}S_{i\sigma}^z
+        $$
+
+        Define
+        $$
+          X^{ff}_\sigma=\frac{1}{N}\sum_{q}t_{q}\langle f_{q\sigma}^+f_{q\sigma}\rangle
+        $$
+        $$
+        X^{fc}_\sigma=\frac{1}{N}\sum_{q\alpha}V_{q\sigma}^\alpha\langle f_{q\sigma}^+c_{q\alpha\sigma}\rangle
+        $$
+        Then 
+        $\lambda_\sigma^0=X^{ff}_\sigma\langle O_{\sigma}^+\rangle \langle O_{\sigma}\rangle8\eta_{\sigma}+[X^{fc}_\sigma\langle O_{\sigma}^+\rangle 2\eta_{\sigma}+c.c.]$
+      </p>
+      <h3>Matrix representation: the fermion part</h3>
+      <p>
+        The fermion Hamiltonian, in matrix form, is:
+        $$H^f_{k\sigma}=\begin{pmatrix}
+        2t_{k}\langle O_{\sigma}^+\rangle\langle O_{\sigma}\rangle - \lambda_\sigma+\lambda_\sigma^0 & V_{k\sigma}^\alpha\langle O_{\sigma}^+\rangle \\
+        (V_{k\sigma}^{\alpha*}\langle O_{\sigma}\rangle)' & H_{c\sigma}
+        \end{pmatrix}-\mu I$$
+        The eigenvector satisfies
+        $$H^f_{k\sigma}v_{k\sigma}=E_{k\sigma}v_{k\sigma}$$
+        Then
+        $$\langle f_{k\sigma}^+f_{k\sigma}\rangle=|v_{k1}|^2$$
+        $$\langle f_{k\sigma}^+c_{k\alpha\sigma}\rangle=v_{k1}^*v_{k\alpha}, \alpha=2,...$$
+      </p>
+      <h3>Matrix representation: the spin part</h3>
+      <p>
+        Re-define:
+        $$
+        \begin{align}
+          H_s & =\frac{1}{N}[\sum_{k\sigma}2t_{k}\langle f_{k\sigma}^+f_{k\sigma}\rangle (\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle) + \sum_{k\sigma\alpha}V_{k\sigma}^\alpha[\langle f_{k\sigma}^+c_{k\alpha\sigma}\rangle O_{\sigma}^+ + h.c.] + \frac{U}{2}\sum_i(S_{i\uparrow}^z+S_{i\downarrow}^z)^2 + \lambda_\sigma\sum_{i\sigma}S_{i\sigma}^z\\
+          & = \sum_\sigma[2\frac{1}{N}\sum_{k}t_{k}\langle f_{k\sigma}^+f_{k\sigma}\rangle(\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle)] + \sum_\sigma [\frac{1}{N}\sum_{k\alpha}V_{k\sigma}^\alpha\langle f_{k\sigma}^+c_{k\alpha\sigma}\rangle O_{\sigma}^+ + \frac{1}{N}\sum_{k\alpha}V_{k\sigma}^\alpha\langle c_{k\alpha\sigma}^+f_{k\sigma}\rangle O_{\sigma}] + \frac{U}{2}(S_{\uparrow}^z+S_{\downarrow}^z)^2 + \lambda_\sigma\sum_{\sigma}S_{\sigma}^z\\
+          & = \sum_\sigma[2X^{ff}_\sigma(\langle O_{\sigma}^+\rangle O_{\sigma}+O_{\sigma}^+\langle O_{\sigma}\rangle)] + \sum_\sigma [X^{fc}_\sigma O_{\sigma}^+ + X^{fc*}_\sigma O_{\sigma}] + \frac{U}{2}(S_{\uparrow}^z+S_{\downarrow}^z)^2 + \lambda_\sigma\sum_{\sigma}S_{\sigma}^z\\
+          & = \sum_\sigma[(2X^{ff}_\sigma\langle O_{\sigma}^+\rangle + X^{fc*}_\sigma) O_{\sigma}+(2X^{ff}_\sigma \langle O_{\sigma}\rangle+X^{fc}_\sigma) O_{\sigma}^+] + \frac{U}{2}(S_{\uparrow}^z+S_{\downarrow}^z)^2 + \lambda_\sigma\sum_{\sigma}S_{\sigma}^z\\
+        \end{align}
+        $$
+        The vector 
+        $$
+        \Psi=\begin{pmatrix}
+        a\\b\\c\\d
+        \end{pmatrix}
+        \begin{pmatrix}
+        |\uparrow\uparrow\rangle & |\uparrow\downarrow\rangle & |\downarrow\uparrow\rangle & |\downarrow\downarrow\rangle
+        \end{pmatrix}
+        $$
+        where the first arrow for the spin up, and the second for the spin down. The spin operators are:
+        $$
+        S_{\uparrow}^+=
+        \begin{pmatrix}
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 \\
+        \end{pmatrix}
+        $$
+        $$
+        S_{\downarrow}^+=
+        \begin{pmatrix}
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 0 & 0 \\
+        \end{pmatrix}
+        $$
+        $$
+        S_{\uparrow}^z=0.5
+        \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & -1 & 0 \\
+        0 & 0 & 0 & -1 \\
+        \end{pmatrix}
+        $$
+        $$
+        S_{\downarrow}^z=0.5
+        \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & -1 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & -1 \\
+        \end{pmatrix}
+        $$
+        $$
+        (S_{\uparrow}^z+S_{\downarrow}^z)^2=
+        \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        \end{pmatrix}
+        $$
+      </p>
+      <h3>The calculation algorithm</h3>
+      <p>
+        Algorithm for the self consist calculation:
+        <pre><code> 
+          Program initialization:
+            Geometry:
+              Define lattice constant
+              Define the atom number
+              Define the atom position
+            Coefficients:
+              Define the Hubbard U
+              Define the off-diagnal tunneling coefficients
+              Define the on-site energy of the non-interacting atoms
+              Define the chemical potential
+            Self consist calculation initialization
+              Define infinitsimal
+              Define the k-mesh
+              Scalar parameter initialization: O, X^{ff}, X^{fc}, lambda, eta, P^+, P^-
+          Self consist calculation:
+            while(S_z+1/2!=N)
+              while(Fermion and Spin parts NOT achieve converge immediately)
+                Fermion part:                
+                  while(X^{ff} and X^{fc} not converge)
+                    update X^{ff} and X^{fc}
+                    calculate lambda^0
+                    N, X^{ff}_new, X^{fc}_new=0                                
+                    for each k
+                      Calculate H_f_noninteracting 
+                      Calculate H_f
+                      Solve the eigenvectors and energies
+                      N+=N_k
+                      X^{ff}_new+=X^{ff}_new_k
+                      X^{fc}_new+=X^{fc}_new_k
+                    end                  
+                  end
+                  calculate final X^{ff} and X^{fc}
+                Spin part:
+                  while(O, P^+, P^- not converge)
+                    Calculate H_s
+                    Solve the eigenvector and energy
+                    Calculate O, P^+, P^-
+                  end
+                  Calculate final O, P^+, P^- and eta
+              end
+              Update lambda
+            end
+        </code> </pre>
+        Algorithm for the band structure calculation:
+        <pre><code> 
+          Program initialization:
+            Geometry:
+              define k-path
+            Get all scalars from self consist calculation
+          Band structure calculation:
+            for each k in k-path
+              Calculate H_f_noninteracting 
+              Calculate H_f
+              Solve and storage the eigenvectors and energies 
+            end
+          plot the band structure
+        </code> </pre>
+        Algorithm for the spectral function calculation (unfinished):
+        <pre><code> 
+          Program initialization:
+            Geometry:
+              define k-path
+            
+          Spectral function calculation:
+
+
+        </code> </pre>
+      </p>
+      
+    </div>  
+    <div class="unread related paper">
+      <hr><br>
+      <h2>Unread related paper</h2>
+      <p></p>
+      
+    </div>
+    <div class="REF">
+      <hr><br>
+      <h2>REF</h2>
+      <p>
+        
+      </p>
+      
+    </div>
+    <div class="blank" style="height: 500px;">
+      
+    </div>
+  
+  </body>
+
+
+  
