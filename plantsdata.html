@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>中国高等植物科属电子检索表</title>
+    <style>
+        body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; }
+        /* 左侧检索区 */
+        #left-panel { width: 45%; border-right: 2px solid #ccc; padding: 20px; overflow-y: auto; background: #f9f9f9; }
+        /* 右侧辅助区 */
+        #right-panel { width: 55%; padding: 20px; overflow-y: auto; background: white; }
+        
+        .question-box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .option-btn { display: block; width: 100%; padding: 12px; margin: 10px 0; text-align: left; 
+                      background: #e1f5fe; border: 1px solid #b3e5fc; cursor: pointer; border-radius: 4px; }
+        .option-btn:hover { background: #b3e5fc; }
+        .breadcrumb { font-size: 0.9em; color: #666; margin-bottom: 10px; }
+        .term-help { color: #d32f2f; font-weight: bold; border-bottom: 1px dashed #d32f2f; cursor: help; }
+        img { max-width: 100%; border-radius: 4px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="left-panel">
+    <div class="breadcrumb" id="path">当前位置：菊科</div>
+    <div id="app">
+        </div>
+    <button onclick="goBack()" style="margin-top:20px;">返回上一步</button>
+</div>
+
+<div id="right-panel">
+    <h3>图解与名词解释</h3>
+    <div id="help-content">
+        <p>点击左侧特征中的红色词汇或选项，此处将显示相关示意图。</p>
+    </div>
+</div>
+
+<script>
+// --- 维护区：所有的检索逻辑都在这里修改 ---
+const treeData = {
+    // --- 第一部分：分族检索表 (基于文档第1页) ---
+    "菊科": {
+        text: "",
+        options: [
+            { text: "1.头状花序有同形或异形的小花,中央的花非舌状,植物无乳汁。",
+            next: "菊科q2", 
+            img: "", 
+            note: "" },
+            { text: "1.头状花序有同形的舌状花,花柱分枝长条形,无附器;叶互生;植物有乳汁。", next: "菊苣族", 
+            img: "", 
+            note: "" }
+        ]
+    },
+    "菊科q2": {
+        text: "",
+        options: [
+            { text: "2.花药的基部钝或微尖。", next: "菊科q3", img: "", note: "" },
+            { text: "2.花药基部尖锐，呈戟形或尾形；叶互生。", next: "菊科q8", img: "", note: "" }
+        ]
+    },
+    "菊科q3": {
+        text: "",
+        options: [
+            { text: "3.花柱分圆柱形,上端有棒状或稍扁而的附器,头状花序盘状,有同形的筒状花;叶通常对生", next: "泽兰族", img: "", note: "" },
+            { text: "3.花柱分枝上端非棒锤状,或稍扁而钝,头状花序辐射状,边缘常有舌状花, 或盘状而无舌状花。", next: "菊科q4", img: "", note: "" }
+        ]
+    },
+    "菊科q4": {
+        text: "",
+        options: [
+            { text: "4.花柱分枝通一面平一面凸形,上端有尖或三角形附器,有时上端钝,叶互生。", next: "紫莞族", img: "", note: "" },
+            { text: "4.花柱分枝通常,无或有尖或三角形附器,有时分枝钻形。", next: "菊科q5", img: "", note: "" }
+        ]
+    },
+    "菊科q5": {
+        text: "",
+        options: [
+            { text: "5.冠毛不存在,或鳞片状、芒状,或冠状。", next: "菊科q6", img: "", note: "5.冠毛通常为毛状；头状花序辐射状或盘状，叶互生" },
+            { text: "千里光族", next: "", img: "", note: "" }
+        ]
+    },
+    "菊科q6": {
+        text: "",
+        options: [
+            { text: "6.总苞片叶质。", next: "菊科q7", img: "", note: "" },
+            { text: "6.总苞片全部或边缘干膜质，头状花序辐射状。", next: "春黄菊族", img: "", note: "" }
+        ]
+    },
+    "菊科q7": {
+        text: "",
+        options: [
+            { text: "7.花序托通常有托片,头状花序通常辐射状,极少冠状;叶通常对生。", next: "向日葵族", img: "", note: "" },
+            { text: "7.花序托无托片;头状序辐射状,叶互生。堆心菊族", next: "", img: "", note: "" }
+        ]
+    },
+    "菊科q8": {
+        text: "",
+        options: [
+            { text: "花柱分枝细长，呈圆柱形或钻形，先端渐尖，无附属器；头状花序盘状，具同形的筒状花", next: "斑鸠菊族", img: "", note: "" },
+            { text: "花柱分枝非细长钻形；头状花序盘状，无舌状花，或为辐射状且具舌状花。", next: "菊科q9", img: "", note: "" }
+        ]
+    },
+    "菊科q9": {
+        text: "",
+        options: [
+            { text: "花柱上端无被毛的节；花柱分枝顶端平截，无附属器，或具三角形附属器。", next: "菊科q10", img: "", note: "" },
+            { text: "花柱上端具稍膨大且被毛的节，节以上部分不分枝；头状花序具同形筒状花，有时具不育的辐射状花", next: "菜蓟族", img: "", note: "" }
+        ]
+    },
+    "菊科q10": {
+        text: "",
+        options: [
+            { text: "头状花序的筒状花浅裂，非二唇形", next: "菊科q11", img: "", note: "" },
+            { text: "头状花序盘状或辐射状，花冠不规则深裂，或呈二唇形；或边缘的花（舌状）", next: "帚菊木族", img: "", note: "" }
+        ]
+    },
+    "菊科q11": {
+        text: "",
+        options: [
+            { text: "冠毛通常呈毛状，稀无冠毛；头状花序盘状，或为辐射状且边缘具舌状花", next: "旋覆花族", img: "", note: "" },
+            { text: "冠毛存在；头状花序辐射状", next: "金盏花族", img: "", note: "" }
+        ]
+    },
+    "斑鸠菊族": {
+        text: "斑鸠菊族 Vernonieae 检索表",
+        options: [
+            { 
+                text: "1. 头状花序分散，各有多数小花。", 
+                next: "斑鸠菊族q2", 
+                img: "capitulum_loose.jpg", 
+                note: "观察头状花序是否独立分布" 
+            },
+            { 
+                text: "1. 头状花序密集形成第二次的复头状花序，各有1至少数小花；果有10纵肋，冠毛1层。", 
+                next: "斑鸠菊族q4", 
+                img: "compound_capitulum.jpg", 
+                note: "复头状花序是指多个头状花序再次聚集在一起" 
+            }
+        ]
+    },
+    "斑鸠菊族q2": {
+        text: "",
+        options: [
+            { 
+                text: "2. 瘦果有4—5（稀6）个高起的肋，上端截形且有五角形厚质的环，无冠毛。", 
+                next: "result_ethulia", 
+                img: "ethulia_fruit.jpg", 
+                note: "我国1种，产云南、台湾" 
+            },
+            { 
+                text: "2. 瘦果有10纵肋，或有4—5棱。", 
+                next: "斑鸠菊族q3", 
+                img: "fruit_ribs.jpg", 
+                note: "注意观察瘦果表面的纵向纹路数量" 
+            }
+        ]
+    },
+    "斑鸠菊族q3": {
+        text: "",
+        options: [
+            { 
+                text: "3. 冠毛有多数毛，宿存，外层冠毛有时膜片状。", 
+                next: "result_vernonia", 
+                img: "pappus_persistent.jpg", 
+                note: "我国30余种，产华南、西南" 
+            },
+            { 
+                text: "3. 冠毛有1—10个易脱落的或部分脱落的毛，或无冠毛。", 
+                next: "result_camchaya", 
+                img: "pappus_deciduous.jpg", 
+                note: "我国1种，产云南" 
+            }
+        ]
+    },
+    "斑鸠菊族q4": {
+        text: "",
+        options: [
+            { 
+                text: "4. 冠毛有多数毛，毛上端细长，基部宽阔；复头状花序单生或排成伞房状。", 
+                next: "result_elephantopus", 
+                img: "elephantopus_pappus.jpg", 
+                note: "我国2种，产华南、西南" 
+            },
+            { 
+                text: "4. 冠毛有两个特别长而扭曲的毛；复头状花序排列成穗状。", 
+                next: "result_pseudelephantopus", 
+                img: "pseudo_pappus.jpg", 
+                note: "归化植物，美洲原产" 
+            }
+        ]
+    },
+
+    // --- 斑鸠菊族 最终结果节点 ---
+    "result_ethulia": { result: "1. 都丽菊属 Ethulia L. f.", info: "特征：瘦果无冠毛，有五角形厚质环。" },
+    "result_vernonia": { result: "2. 斑鸠菊属 Vernonia Schreb.", info: "特征：冠毛多数且宿存，外层有时膜片状。" },
+    "result_camchaya": { result: "3. 凋缨菊属 Camchaya Gagnep.", info: "特征：冠毛易脱落或无冠毛。" },
+    "result_elephantopus": { result: "4. 地胆草属 Elephantopus L.", info: "特征：冠毛多数，基部宽阔，复头状花序伞房状。" },
+    "result_pseudelephantopus": { result: "5. 假地胆草属 Pseudelephantopus Rohr.", info: "特征：冠毛具2条长而扭曲的毛，复头状花序穗状。" },
+    // --- II. 泽兰族 Eupatorieae 检索逻辑 ---
+    "泽兰族": {
+        text: "II. 泽兰族 Eupatorieae 检索表",
+        options: [
+            { 
+                text: "1. 花药上端截形，无附片；果有5棱。总苞片多数，排列成1—2层；冠毛3—5，棒状，基部结合成环状。", 
+                next: "result_adenostemma", 
+                img: "adenostemma.jpg", 
+                note: "我国2种，产华南、西南" 
+            },
+            { 
+                text: "1. 花药上端尖，有附片，果也有5棱。总苞片基部不结合。", 
+                next: "泽兰族q2", 
+                img: "anther_appendage.jpg", 
+                note: "注意观察花药顶端的细微结构" 
+            }
+        ]
+    },
+    "泽兰族q2": {
+        text: "",
+        options: [
+            { 
+                text: "2. 冠毛膜片状，下部宽，上部细长；总苞片2—3层，稍不相等。", 
+                next: "result_ageratum", 
+                img: "ageratum_pappus.jpg", 
+                note: "我国2种，产华东、华南、西南" 
+            },
+            { 
+                text: "2. 冠毛毛状，多数，分离。", 
+                next: "泽兰族q3", 
+                img: "bristle_pappus.jpg", 
+                note: "冠毛呈现为多数独立的毛状结构" 
+            }
+        ]
+    },
+    "泽兰族q3": {
+        text: "",
+        options: [
+            { 
+                text: "3. 总苞片多数，覆瓦状排列，或2—3层，稍不相等；头状花序有5至多数小花，直立草本。", 
+                next: "result_eupatorium", 
+                img: "eupatorium_involucre.jpg", 
+                note: "我国约14种，除新疆、西藏外广布" 
+            },
+            { 
+                text: "3. 总苞片4个，稍不相等；头状花序有4个小花，攀援草本。", 
+                next: "result_mikania", 
+                img: "mikania_habit.jpg", 
+                note: "我国1种，产广东、台湾、云南" 
+            }
+        ]
+    },
+
+    // --- 泽兰族 最终结果节点 ---
+    "result_adenostemma": { 
+        result: "6. 下田菊属 Adenostemma J. R. et G. Forst.", 
+        info: "特征：花药无附片，冠毛棒状且基部合生。" 
+    },
+    "result_ageratum": { 
+        result: "7. 胜红蓟属 Ageratum L.", 
+        info: "特征：冠毛膜片状，基部较宽。" 
+    },
+    "result_eupatorium": { 
+        result: "8. 泽兰属 Eupatorium L.", 
+        info: "特征：直立草本，总苞片多数，小花5至多数。" 
+    },
+    "result_mikania": { 
+        result: "9. 假泽兰属 Mikania Willd.", 
+        info: "特征：攀援草本，总苞片4个，小花4个。" 
+    },
+    // --- III. 紫菀族 Astereae 检索逻辑 ---
+    "紫菀族": {
+        text: "III. 紫菀族 Astereae 检索表",
+        options: [
+            { text: "1. 头状花序辐射状，舌状花黄色；冠毛有多数长毛。", next: "result_solidago", img: "solidago.jpg", note: "一枝黄花属：我国1种，广布" },
+            { text: "1. 头状花序辐射状，舌状花白色、红色或紫色，或头状花序盘状，无舌状花。", next: "紫菀族q2", img: "", note: "" }
+        ]
+    },
+    "紫菀族q2": {
+        text: "",
+        options: [
+            { text: "2. 头状花序小，盘状，有2至多层筒状雌花；花冠筒上端2—4裂，冠毛不存在，或由状或短毛状。", next: "紫菀族q3", img: "", note: "" },
+            { text: "2. 头状花序较大，辐射状，有舌状雌花，或头状花序盘状而有细筒状雌花。", next: "紫菀族q5", img: "", note: "" }
+        ]
+    },
+    "紫菀族q3": {
+        text: "",
+        options: [
+            { text: "3. 花序托伸长成球状，瘦果上端无细裂或具齿的环，通常直立草本。", next: "紫菀族q4", img: "receptacle_spherical.jpg", note: "" },
+            { text: "3. 花序托圆锥形或凸起；果上端平，有细裂或具齿的环；通常匍匐草本。", next: "result_grangea", img: "grangea.jpg", note: "田基黄属：我国1种，产华南、云南" }
+        ]
+    },
+    "紫菀族q4": {
+        text: "",
+        options: [
+            { text: "4. 花序托上端平；果扁，有加厚的边缘。", next: "result_dichrocephala", img: "", note: "鱼眼草属：我国3种，产华南、西南" },
+            { text: "4. 花序托上端凸；果扁，但无加厚的缘。", next: "result_cyathocline", img: "", note: "杯菊属：我国1种，华南" }
+        ]
+    },
+    "紫菀族q5": {
+        text: "",
+        options: [
+            { text: "5. 头状花序有显著展开的舌状雌花，或有时无雌花。", next: "紫菀族q6", img: "ligulate_flower.jpg", note: "" },
+            { text: "5. 头状花序有细筒状的雌花，有时雌花的花冠有直立的小舌片，或雌花无花冠，但无明显展开的舌状花。", next: "紫菀族q27", img: "tubular_female.jpg", note: "" }
+        ]
+    },
+    "紫菀族q6": {
+        text: "",
+        options: [
+            { text: "6. 果有喙，或上端狭窄，或微尖，上端有粘质的环；雌花通常有2至多层。", next: "紫菀族q7", img: "fruit_beak.jpg", note: "" },
+            { text: "6. 果无喙，扁，雌花通常一层。", next: "紫菀族q9", img: "", note: "" }
+        ]
+    },
+    "紫菀族q7": {
+        text: "",
+        options: [
+            { text: "7. 无茎草本，头状花序单生于花葶的顶端；两性花通常不结果实。", next: "result_lagenophora", img: "", note: "瓶头草属：我国1种" },
+            { text: "7. 茎直立，有分枝，头状花序生枝上。", next: "紫菀族q8", img: "", note: "" }
+        ]
+    },
+    "紫菀族q8": {
+        text: "",
+        options: [
+            { text: "8. 全部的果实有喙；冠毛不存在或有1—5凋落的毛。", next: "result_rhynchospermum", img: "", note: "秋分草属：我国1种" },
+            { text: "8. 果微尖或有短喙；无冠毛。", next: "result_myriactis", img: "", note: "齿冠草属：我国5种" }
+        ]
+    },
+    "紫菀族q9": {
+        text: "",
+        options: [
+            { text: "9. 冠毛存在；总苞片大，近等长。", next: "result_bellis", img: "bellis.jpg", note: "雏菊属：欧洲原产，常栽培" },
+            { text: "9. 冠毛有长或短毛，或膜片，或瘦果顶端狭环状而无冠毛。", next: "紫菀族q10", img: "", note: "" }
+        ]
+    },
+    "紫菀族q10": {
+        text: "",
+        options: [
+            { text: "10. 冠毛极短，膜片状或芒状，或缺识。", next: "紫菀族q11", img: "short_pappus.jpg", note: "" },
+            { text: "10. 冠毛长，毛状，有或无外层的膜片。", next: "紫菀族q13", img: "long_pappus.jpg", note: "" }
+        ]
+    },
+    "紫菀族q11": {
+        text: "",
+        options: [
+            { text: "11. 两性花不结果实；冠毛有1至多数芒，或有芒和膜片。", next: "result_calotis", img: "", note: "刺冠菊属：我国1种，产广东海南岛" },
+            { text: "11. 两性花结果实。", next: "紫菀族q12", img: "", note: "" }
+        ]
+    },
+    "紫菀族q12": {
+        text: "",
+        options: [
+            { text: "12. 瘦果顶端有狭环状边缘而无冠毛。", next: "result_gymnaster", img: "", note: "裸菀属：我国3种，产西北、华北、华东" },
+            { text: "12. 瘦果顶端有冠毛状或膜片状短冠毛。", next: "result_kalimeris", img: "", note: "马兰属：我国8种，广布" }
+        ]
+    },
+    "紫菀族q13": {
+        text: "",
+        options: [
+            { text: "13. 总苞片外层叶状，大，内层膜质或干膜质；冠毛2层，内层毛质，外层膜质状；一年生草本。", next: "result_callistephus", img: "", note: "翠菊属：我国1种，广布" },
+            { text: "13. 总苞片外层非叶状；冠毛1层或多层，有时兼有外层膜片。", next: "紫菀族q14", img: "", note: "" }
+        ]
+    },
+    "紫菀族q14": {
+        text: "",
+        options: [
+            { text: "14. 总苞片多层，覆瓦状排列，叶质或边缘干膜质，或2层，近等长；舌状花通常1层，花柱分枝顶端微针形。", next: "紫菀族q15", img: "involucre_imbricate.jpg", note: "" },
+            { text: "14. 总苞片2层，狭窄，等长；花柱分枝短三角形，雌花1或多层。", next: "紫菀族q26", img: "", note: "" }
+        ]
+    },
+    "紫菀族q15": {
+        text: "",
+        options: [
+            { text: "15. 舌状花长；较冠毛为长，有时无舌状花。", next: "紫菀族q16", img: "", note: "" },
+            { text: "15. 舌状花短，较冠毛为短。", next: "紫菀族q25", img: "", note: "" }
+        ]
+    },
+    "紫菀族q16": {
+        text: "",
+        options: [
+            { text: "16. 筒状花左右对称，1裂片较长，舌状花冠毛毛状，膜片状，或无冠毛。", next: "result_heteropappus", img: "", note: "狗娃花属：我国10种，广布" },
+            { text: "16. 筒状花中轴对称，5裂片等长；舌状花及筒状花的冠毛都是糙毛状。", next: "紫菀族q17", img: "", note: "" }
+        ]
+    },
+    "紫菀族q17": {
+        text: "",
+        options: [
+            { text: "17. 冠毛1—2层，外层极短或膜片状；多年生草本或半灌木。", next: "紫菀族q18", img: "", note: "" },
+            { text: "17. 冠毛多层，多少不等长，全部毛状。", next: "紫菀族q24", img: "", note: "" }
+        ]
+    },
+    "紫菀族q18": {
+        text: "",
+        options: [
+            { text: "18. 瘦果圆柱形两端稍狭，除边肋外，两面各有2细肋；冠毛有多数毛。", next: "result_doellingeria", img: "", note: "东风菜属：我国2种，广布" },
+            { text: "18. 瘦果矩圆形或卵圆形，稍扁。", next: "紫菀族q19", img: "", note: "" }
+        ]
+    },
+    "紫菀族q19": {
+        text: "",
+        options: [
+            { text: "19. 瘦果边缘有细肋，两面无肋，被长密毛。", next: "result_turczaninowia", img: "", note: "女菀属：我国1种" },
+            { text: "19. 瘦果边缘有肋，两面有肋或无肋，被疏毛或无毛。", next: "紫菀族q20", img: "", note: "" }
+        ]
+    },
+    "紫菀族q20": {
+        text: "",
+        options: [
+            { text: "20. 瘦果有明显的肋，边缘的小花结果实；冠毛1—2层，外层极短或较短。", next: "紫菀族q21", img: "", note: "" },
+            { text: "20. 瘦果无明显的肋，边缘的小花不结果实或不存在，冠毛2—3层糙毛。", next: "紫菀族q23", img: "", note: "" }
+        ]
+    },
+    "紫菀族q21": {
+        text: "",
+        options: [
+            { text: "21. 花柱分枝附片披针形；瘦果被疏毛或腺。", next: "紫菀族q22", img: "style_branch_lanceolate.jpg", note: "" },
+            { text: "21. 花柱分枝附片三角形；瘦果被长贴毛；半灌木。", next: "result_asterothamnus", img: "", note: "紫菀木属：我国约5种" }
+        ]
+    },
+    "紫菀族q22": {
+        text: "",
+        options: [
+            { text: "22. 冠毛1层或2层，外层短膜片状。", next: "result_aster", img: "aster.jpg", note: "紫菀属：我国约百种" },
+            { text: "22. 冠毛2层，外层较短，筒状花花冠常2唇形。", next: "result_krylovia", img: "", note: "岩菊属：我国有2种" }
+        ]
+    },
+    "紫菀族q23": {
+        text: "",
+        options: [
+            { text: "23. 边缘的小花不结果实、舌状、无雌蕊；瘦果倒披针形。", next: "result_galatella", img: "", note: "乳菀属：我国12种" },
+            { text: "23. 边缘的小花不存在，瘦果长圆形。", next: "result_linosyris", img: "", note: "麻菀属：我国2种" }
+        ]
+    },
+    "紫菀族q24": {
+        text: "",
+        options: [
+            { text: "24. 瘦果长圆形，两面无肋，被长密毛，头状花序单生于茎端；叶狭长，不掌状。", next: "result_arctogeron", img: "", note: "莎菀属：1种，产北部及东北部" },
+            { text: "24. 瘦果狭矩圆形，有厚边肋，两面各有1细肋，无毛或有疏毛，头状花序多数，伞房状排列；叶披针形。", next: "result_tripolium", img: "", note: "碱菀属：1种，广布" }
+        ]
+    },
+    "紫菀族q25": {
+        text: "",
+        options: [
+            { text: "25. 两性花辐射对称，直立草本。", next: "result_brachyactis", img: "", note: "短星菊属：我国约4种" },
+            { text: "25. 两性花左右对称，攀援草本。", next: "result_heteroplexis", img: "", note: "异裂菊属：1种，产广西" }
+        ]
+    },
+    "紫菀族q26": {
+        text: "",
+        options: [
+            { text: "26. 两性花及雌花同色（黄色或红色）；两性花不育。", next: "result_psychrogeton", img: "", note: "寒蓬属：我国2种，产新疆、西藏" },
+            { text: "26. 两性花及雌花异色（紫色、白色或橙色）；两性花结果实。", next: "result_erigeron", img: "erigeron.jpg", note: "飞蓬属：我国30余种" }
+        ]
+    },
+    "紫菀族q27": {
+        text: "",
+        options: [
+            { text: "27. 冠毛长，雌花有冠毛。", next: "紫菀族q28", img: "", note: "" },
+            { text: "27. 冠毛短，雌花通常无冠毛；直立草本。", next: "result_thespis", img: "", note: "敌伞菊属：我国1种，产云南" }
+        ]
+    },
+    "紫菀族q28": {
+        text: "",
+        options: [
+            { text: "28. 果圆柱形，有5肋；高大或攀援亚灌木。", next: "result_microglossa", img: "", note: "小舌菊属：我国1种，产华南、西南" },
+            { text: "28. 果扁或稍扁，有2—5棱；直立草本。", next: "result_conyza", img: "conyza.jpg", note: "白酒草属：我国10种" }
+        ]
+    },
+
+    // --- 紫菀族 结果节点 ---
+    "result_solidago": { result: "10. 一枝黄花属 Solidago L.", info: "特征：舌状花黄色，冠毛多数长毛。" },
+    "result_dichrocephala": { result: "11. 鱼眼草属 Dichrocephala L'Herit. ex DC.", info: "特征：花序托上端平，瘦果扁且有加厚边缘。" },
+    "result_cyathocline": { result: "12. 杯菊属 Cyathocline Cass.", info: "特征：花序托上端凸，瘦果无加厚边缘。" },
+    "result_grangea": { result: "13. 田基黄属 Grangea Adans.", info: "特征：花序托圆锥形，匍匐草本。" },
+    "result_lagenophora": { result: "14. 瓶头草属 Lagenophora Cass.", info: "特征：无茎草本，花序单生花葶顶端。" },
+    "result_rhynchospermum": { result: "15. 秋分草属 Rhynchospermum Reinw.", info: "特征：全部果实有喙，冠毛极少或无。" },
+    "result_myriactis": { result: "16. 齿冠草属 Myriactis Less.", info: "特征：果微尖或短喙，无冠毛。" },
+    "result_bellis": { result: "17. 雏菊属 Bellis L.", info: "特征：总苞片大且近等长，常栽培观赏。" },
+    "result_calotis": { result: "18. 刺冠菊属 Calotis R. Br.", info: "特征：两性花不育，冠毛有芒。" },
+    "result_gymnaster": { result: "19. 裸菀属 Gymnaster Kitam.", info: "特征：瘦果顶端有狭环而无冠毛。" },
+    "result_kalimeris": { result: "20. 马兰属 Kalimeris Cass.", info: "特征：瘦果有短冠毛或膜片状冠毛。" },
+    "result_callistephus": { result: "21. 翠菊属 Callistephus Cass.", info: "特征：总苞外层叶状，冠毛2层。" },
+    "result_heteropappus": { result: "22. 狗娃花属 Heteropappus Less.", info: "特征：筒状花左右对称，1裂片较长。" },
+    "result_doellingeria": { result: "23. 东风菜属 Doellingeria Nees.", info: "特征：瘦果圆柱形，每面2细肋。" },
+    "result_turczaninowia": { result: "24. 女菀属 Turczaninowia DC.", info: "特征：瘦果边缘有细肋，两面无肋，被长密毛。" },
+    "result_aster": { result: "25. 紫菀属 Aster L.", info: "特征：花柱分枝附片披针形，冠毛1-2层。" },
+    "result_krylovia": { result: "26. 岩菊属 Krylovia Schischk.", info: "特征：冠毛2层，外层短，筒状花常2唇形。" },
+    "result_asterothamnus": { result: "27. 紫菀木属 Asterothamnus Novopokr.", info: "特征：半灌木，花柱附片三角形，果被贴毛。" },
+    "result_galatella": { result: "28. 乳菀属 Galatella Cass.", info: "特征：边花舌状不结果，瘦果倒披针形。" },
+    "result_linosyris": { result: "29. 麻菀属 Linosyris Cass.", info: "特征：边花缺失，瘦果长圆形。" },
+    "result_arctogeron": { result: "30. 莎菀属 Arctogeron DC.", info: "特征：瘦果无肋被长密毛，花序单生。" },
+    "result_tripolium": { result: "31. 碱菀属 Tripolium Nees.", info: "特征：瘦果有厚边肋，伞房状花序。" },
+    "result_brachyactis": { result: "32. 短星菊属 Brachyactis Ledeb.", info: "特征：舌状花短，两性花辐射对称。" },
+    "result_heteroplexis": { result: "33. 异裂菊属 Heteroplexis Chang.", info: "特征：攀援草本，两性花左右对称。" },
+    "result_psychrogeton": { result: "34. 寒蓬属 Psychrogeton Boiss.", info: "特征：两性花与雌花同色且不育。" },
+    "result_erigeron": { result: "35. 飞蓬属 Erigeron L.", info: "特征：两性花与雌花异色且结果。" },
+    "result_microglossa": { result: "36. 小舌菊属 Microglossa DC.", info: "特征：亚灌木，果圆柱形5肋。" },
+    "result_conyza": { result: "37. 白酒草属 Conyza Less.", info: "特征：直立草本，果扁，雌花多层。" },
+    "result_thespis": { result: "38. 敌伞菊属 Thespis DC.", info: "特征：冠毛短，雌花无冠毛。" },
+    // --- IV. 旋覆花族 Inuleae 检索逻辑 ---
+    "旋覆花族": {
+        text: "IV. 旋覆花族 Inuleae 检索表",
+        options: [
+            { text: "1. 雌花花冠细筒状或丝状；头状花序盘状，有异形花或同形花；雌花花柱较花冠长。", next: "旋覆花族q2", img: "", note: "" },
+            { text: "1. 雌花花冠舌状或筒状；头状花序辐射状或盘状，有异形小花，或同形的两性花。", next: "旋覆花族q18", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q2": {
+        text: "",
+        options: [
+            { text: "2. 总苞片草质、干质或厚质；花序托无托片，但有托毛；两性花花柱分枝钝，丝状或不分枝。", next: "旋覆花族q3", img: "", note: "" },
+            { text: "2. 总苞片干膜质或膜质，透明，有时内层开展成辐射状；草本，通常被绵毛，稀无毛。", next: "旋覆花族q11", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q3": {
+        text: "",
+        options: [
+            { text: "3. 头状花序分散，不紧密集合成复头状花序。", next: "旋覆花族q4", img: "", note: "" },
+            { text: "3. 头状花序紧密结合成球状或圆柱状的复头状花序，各有1或少数两性花及少数雌花。", next: "旋覆花族q10", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q4": {
+        text: "",
+        options: [
+            { text: "4. 头状花序单生于茎端；冠毛有红褐色直糙毛；总苞片厚质；瘦果长10毫米。", next: "result_cavea", img: "", note: "革菊属：我国1种，产四川、西藏" },
+            { text: "4. 头状花序排列成伞房状或圆锥状花序；冠毛有细毛或无冠毛；瘦果小。", next: "旋覆花族q5", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q5": {
+        text: "",
+        options: [
+            { text: "5. 冠毛细毛状。", next: "旋覆花族q6", img: "", note: "" },
+            { text: "5. 无冠毛；直立或铺散草本；花药有尾，总苞片干质。", next: "result_epaltes", img: "", note: "鹅不食草属：我国2种，产海南岛" }
+        ]
+    },
+    "旋覆花族q6": {
+        text: "",
+        options: [
+            { text: "6. 总苞片狭窄，条状披针形或披针形；一年或多年生草本或茎基部稍木质。", next: "旋覆花族q7", img: "", note: "" },
+            { text: "6. 总苞片宽阔，卵圆形至披针形，干质，稀木质。", next: "旋覆花族q9", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q7": {
+        text: "",
+        options: [
+            { text: "7. 花药基部有尾，结合；总苞片草质。", next: "result_blumea", img: "", note: "艾纳香属：我国30余种，产华南、西南" },
+            { text: "7. 花药基部钝或有小尖头，无尾。", next: "旋覆花族q8", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q8": {
+        text: "",
+        options: [
+            { text: "8. 雄蕊1—4，花药分离；总苞片草质。", next: "result_blumeopsis", img: "", note: "拟艾纳香属：我国1种，产华南、西南" },
+            { text: "8. 雄蕊5，花药结合；总苞片常硬质。", next: "result_laggera", img: "", note: "六棱菊属：我国2种，产西南、华南" }
+        ]
+    },
+    "旋覆花族q9": {
+        text: "",
+        options: [
+            { text: "9. 总苞侧卵圆形、宽钟形或半球形；花药基部有尾；半灌木或灌木。", next: "result_pluchea", img: "", note: "阔苞菊属：我国3种，产华南、西南" },
+            { text: "9. 总苞范围圆形；花药基部有小尖头；多年生草本。", next: "result_karelinia", img: "", note: "花花柴属：1种，产甘肃、新疆" }
+        ]
+    },
+    "旋覆花族q10": {
+        text: "",
+        options: [
+            { text: "10. 无冠毛；复头状花序在枝端单生。", next: "result_sphaeranthus", img: "", note: "戴星草属：我国2-3种，产广东、云南" },
+            { text: "10. 有细柱状冠毛；复头状花序无柄，疏散总状排列，或在枝端单生。", next: "result_pterocaulon", img: "", note: "翼茎草属：1种，产海南岛" }
+        ]
+    },
+    "旋覆花族q11": {
+        text: "",
+        options: [
+            { text: "11. 花序托有托片，外层小花为托片所抱；两性花花柱分枝，或前端钝而有钻形的分枝。", next: "旋覆花族q12", img: "", note: "" },
+            { text: "11. 花序托无托片；两性花花柱分枝顶端截形；草本或半灌木；有毛状冠毛。", next: "旋覆花族q13", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q12": {
+        text: "",
+        options: [
+            { text: "12. 无冠毛；托片结合、基部粘着于子房上；植物无毛。", next: "result_symphyllocarpus", img: "", note: "含苞草属：1种，产东北" },
+            { text: "12. 两性花及内层雌花有1—2层毛状冠毛，外层雌花有较少的冠毛或无冠毛；托片内凹，拥抱外层或全部雌花；植物有绵毛。", next: "result_filago", img: "", note: "絮菊属：我国2-3种，产新疆、西藏" }
+        ]
+    },
+    "旋覆花族q13": {
+        text: "",
+        options: [
+            { text: "13. 两性花不结果实；两性花花柱不分枝，或浅裂，或有短分枝。", next: "旋覆花族q14", img: "", note: "" },
+            { text: "13. 两性花全部或大部分结果实；两性花花柱有分枝，冠毛基部离生或结合。", next: "旋覆花族q16", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q14": {
+        text: "",
+        options: [
+            { text: "14. 冠毛基部结合成环状；头状花序多少密集伞房状排列，稀单生。", next: "旋覆花族q15", img: "", note: "" },
+            { text: "14. 冠毛基部分离，分散脱落；头状花序伞房状稀穗状排列，有雌花和较少的两性不育花。", next: "result_anaphalis", img: "", note: "香青属：我国50余种，广布" }
+        ]
+    },
+    "旋覆花族q15": {
+        text: "",
+        options: [
+            { text: "15. 雌雄异株；头状花序通常伞房状排列，外围无开展的复叶群。", next: "result_antennaria", img: "", note: "蝶须属：我国1种，产内蒙古、新疆" },
+            { text: "15. 雌雄同株或异株；头状花序单性或有雌花及两性不育花，伞房状密集排列，稀单生。", next: "result_leontopodium", img: "", note: "火绒草属：我国41种，广布" }
+        ]
+    },
+    "旋覆花族q16": {
+        text: "",
+        options: [
+            { text: "16. 头状花序有雌花及两性花；总苞片黄色或褐色，或无色，通常不开展。", next: "旋覆花族q17", img: "", note: "" },
+            { text: "16. 头状花序仅有两性花，或外层兼有少数雌花；总苞片有白色或各色的瓣状附片，紧压或疏松，或放射状开展。", next: "result_helichrysum", img: "", note: "蜡菊属：我国约2种，产新疆" }
+        ]
+    },
+    "旋覆花族q17": {
+        text: "",
+        options: [
+            { text: "17. 雌花多层；花药基部钝或微尖；半灌木或多年生草本。", next: "result_phagnalon", img: "", note: "棉毛草属：我国1种，产西藏" },
+            { text: "17. 雌花2至多层；花药基部有尾；草本半灌木。", next: "result_gnaphalium", img: "", note: "鼠鞠草属：我国约15种，广布" }
+        ]
+    },
+    "旋覆花族q18": {
+        text: "",
+        options: [
+            { text: "18. 花序托无托片；两性花花柱分枝顶端膨大或圆形，草本或半灌木。", next: "旋覆花族q19", img: "", note: "" },
+            { text: "18. 花序托有托片；两性花花柱分枝顶端圆形或截形；草本；头状花序辐射状。", next: "旋覆花族q24", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q19": {
+        text: "",
+        options: [
+            { text: "19. 有冠毛。", next: "旋覆花族q20", img: "", note: "" },
+            { text: "19. 无冠毛；头状花序盘状，雌花花冠筒状。", next: "旋覆花族q23", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q20": {
+        text: "",
+        options: [
+            { text: "20. 冠毛全部毛状。", next: "旋覆花族q21", img: "", note: "" },
+            { text: "20. 冠毛2层，内层毛状，外层短，膜片状；总苞片草质；头状花序辐射状，有舌状花。", next: "旋覆花族q22", img: "", note: "" }
+        ]
+    },
+    "旋覆花族q21": {
+        text:"",
+        options: [
+            { text: "21. 总苞片厚质，上端有刺；头状花序盘状，无舌状花。", next: "result_tugarinovia", img: "", note: "革苞菊属：我国1种，产内蒙古" },
+            { text: "21. 总苞片草质，或有叶状附片，无刺；头状花序通常辐射状，或有时盘状而无舌状花。", next: "result_inula", img: "", note: "旋覆花属：我国20余种，广布" }
+        ]
+    },
+    "旋覆花族q22": {
+        text:"",
+        options: [
+            { text: "22. 小花全部有冠毛，冠毛近等长，有多数细毛；瘦果有肋或无肋。", next: "result_pentanema", img: "", note: "离舌草属：我国3种，产广西北部" },
+            { text: "22. 舌状花无冠毛或有少数短毛；冠毛有少数或多数细毛；瘦果无肋。", next: "result_pulicaria", img: "", note: "蚤草属：我国4种，产四川、新疆、西藏" }
+        ]
+    },
+    "旋覆花族q23": {
+        text:"",
+        options: [
+            { text: "23. 两性花及雌花都结果实；小花极多数；瘦果无纵肋，上端狭窄成喙，有腺。", next: "result_carpesium", img: "", note: "天名精属：我国10余种，广布" },
+            { text: "23. 两性花7—8个，不结果实；雌花7—11个，结果实；瘦果无纵肋，下部狭窄，有腺。", next: "result_adenocaulon", img: "", note: "腺梗菜属：我国1种，广布" }
+        ]
+    },
+    "旋覆花族q24": {
+        text:"",
+        options: [
+            { text: "24. 舌状花瘦果有3棱或翅；冠毛的膜片基部结合成冠状，顶部有时芒状；头状花序常单生。", next: "result_buphthalmum", img: "", note: "牛腺菊属：1种，归化及栽培" },
+            { text: "24. 瘦果全部圆柱形，无棱；冠毛的膜片分离，有3—5芒或无芒；头状花序近伞房状排列或单生。", next: "result_anisopappus", img: "", note: "山黄菊属：我国1种，产华南、西南" }
+        ]
+    },
+
+    // --- 旋覆花族 结果节点 ---
+    "result_cavea": { result: "39. 革菊属 Cavea W. W. Smith et Small", info: "特征：头状花序单生茎端，冠毛红褐色直糙毛，瘦果长10毫米。" },
+    "result_blumea": { result: "40. 艾纳香属 Blumea DC.", info: "特征：花药基部有尾且结合，总苞片草质，条状披针形。" },
+    "result_blumeopsis": { result: "41. 拟艾纳香属 Blumeopsis Gagnep.", info: "特征：雄蕊1—4，花药分离，总苞片草质。" },
+    "result_laggera": { result: "42. 六棱菊属 Laggera Sch. Bip. ex Oliv.", info: "特征：雄蕊5，花药结合，总苞片硬质。" },
+    "result_pluchea": { result: "43. 阔苞菊属 Pluchea Cass.", info: "特征：灌木或半灌木，总苞宽钟形，花药有尾。" },
+    "result_karelinia": { result: "44. 花花柴属 Karelinia Less.", info: "特征：多年生草本，总苞范围圆形，花药基部小尖头。" },
+    "result_epaltes": { result: "45. 鹅不食草属 Epaltes Cass.", info: "特征：无冠毛，花药有尾，总苞片干质。" },
+    "result_sphaeranthus": { result: "46. 戴星草属 Sphaeranthus L.", info: "特征：复头状花序球状，无冠毛。" },
+    "result_pterocaulon": { result: "47. 翼茎草属 Pterocaulon Ell.", info: "特征：复头状花序，有细柱状冠毛。" },
+    "result_symphyllocarpus": { result: "48. 含苞草属 Symphyllocarpus Maxim.", info: "特征：植物无毛，无冠毛，托片基部粘着于子房。" },
+    "result_filago": { result: "49. 絮菊属 Filago L.", info: "特征：植物被绵毛，两性花及雌花有毛状冠毛。" },
+    "result_antennaria": { result: "50. 蝶须属 Antennaria Gaertn.", info: "特征：雌雄异株，冠毛基部结合成环。" },
+    "result_leontopodium": { result: "51. 火绒草属 Leontopodium R. Br. ex Cass.", info: "特征：冠毛基部结合成环，外围有开展的复叶群。" },
+    "result_anaphalis": { result: "52. 香青属 Anaphalis DC.", info: "特征：两性不育，冠毛基部分离，分散脱落。" },
+    "result_phagnalon": { result: "53. 棉毛草属 Phagnalon Cass.", info: "特征：雌花多层，花药基部钝或微尖。" },
+    "result_gnaphalium": { result: "54. 鼠鞠草属 Gnaphalium L.", info: "特征：雌花多层，花药基部有尾。" },
+    "result_helichrysum": { result: "55. 蜡菊属 Helichrysum L.", info: "特征：总苞片有色瓣状附片，放射状开展。" },
+    "result_tugarinovia": { result: "56. 革苞菊属 Tugarinovia Iljin", info: "特征：总苞片厚质上端有刺，头状花序盘状。" },
+    "result_inula": { result: "57. 旋覆花属 Inula L.", info: "特征：总苞片草质无刺，头状花序通常辐射状。" },
+    "result_pentanema": { result: "58. 离舌草属 Pentanema Cass.", info: "特征：冠毛2层，内层毛状外层短膜片，小花全部有冠毛。" },
+    "result_pulicaria": { result: "59. 蚤草属 Pulicaria Gaertn.", info: "特征：舌状花无冠毛或短毛，冠毛细毛状。" },
+    "result_carpesium": { result: "60. 天名精属 Carpesium L.", info: "特征：无冠毛，瘦果无纵肋，上端狭窄成喙。" },
+    "result_adenocaulon": { result: "61. 腺梗菜属 Adenocaulon Hook.", info: "特征：两性花不育，雌花结果实，瘦果下部狭窄。" },
+    "result_buphthalmum": { result: "62. 牛腺菊属 Buphthalmum L.", info: "特征：舌状花瘦果3棱或翅，冠毛膜片结合成冠状。" },
+    "result_anisopappus": { result: "63. 山黄菊属 Anisopappus Hook. et Arn.", info: "特征：瘦果圆柱形无棱，冠毛膜片分离。" },
+    // --- V. 向日葵族 Heliantheae 检索逻辑 ---
+    "向日葵族": {
+        text: "V. 向日葵族 Heliantheae 检索表",
+        options: [
+            { text: "1. 花序托无托片或仅在雌花以内（花序中央）无托片；头状花序小，有异形小花，两性花不结果实；叶互生。", next: "向日葵族q2", img: "", note: "" },
+            { text: "1. 花序托有托片。", next: "向日葵族q3", img: "receptacle_palea.jpg", note: "注意观察剥开小花后，花序托上是否有片状的膜质附属物" }
+        ]
+    },
+    "向日葵族q2": {
+        text: "",
+        options: [
+            { text: "2. 一年生小草本；雌花2—4个，两性花1—3个；果有3锐棱，叶狭长。", next: "result_shearardia", img: "", note: "我国1种，产华中、华东、华南" },
+            { text: "2. 多年生草本；雌花2—4个，两性花较多；果棱，棒锤状，叶心形。", next: "result_adenocaulon_v", img: "", note: "详见腺梗菜属" }
+        ]
+    },
+    "向日葵族q3": {
+        text: "",
+        options: [
+            { text: "3. 头状花序单性，有同形花，雌雄同株；雌花无花冠；花药分离或结合；花序托在两性花之间有毛状托片，雌头状花序总状或穗状排列。", next: "向日葵族q4", img: "unisexual_capitula.jpg", note: "" },
+            { text: "3. 头状花序有异形花，雌雄同株；雌花花冠舌状或筒状，或有时雌花不存在而头状花序具同形花；花药结合。", next: "向日葵族q5", img: "", note: "" }
+        ]
+    },
+    "向日葵族q4": {
+        text: "",
+        options: [
+            { text: "4. 雌头状花序的总苞片1层，分离，雌头状花序的总苞有多层钩刺，2室，有2花；一年生草本，叶互生。", next: "result_xanthium", img: "xanthium_fruit.jpg", note: "苍耳属：果实具钩刺，极易辨识" },
+            { text: "4. 雌头状花序的总苞片结合，雌头状花序的总苞结合，雌头状花序的总苞有1列钩刺或瘤；草本或灌木；叶互生。", next: "result_ambrosia", img: "", note: "豚草属：著名的过敏原植物" }
+        ]
+    },
+    "向日葵族q5": {
+        text: "",
+        options: [
+            { text: "5. 两性花不结果实，其花柱不分枝；花序托的托片常膜质。", next: "向日葵族q6", img: "", note: "" },
+            { text: "5. 两性花通常结果实，其花柱有分枝；花序托托片膜质或干膜质，常褶叠，或平，或内凹。", next: "向日葵族q7", img: "", note: "" }
+        ]
+    },
+    "向日葵族q6": {
+        text: "",
+        options: [
+            { text: "6. 瘦果肥厚，不扁压，为具钩刺的内层总苞片所紧密包裹；一年生草本或半灌木；叶对生。", next: "result_acanthospermum", img: "", note: "刺苞果属：我国1种，产云南" },
+            { text: "6. 瘦果背面扁压，腹面有棱，为不具刺的内层总苞片所包裹；草本或半灌木；叶互生。", next: "result_parthenium", img: "", note: "银胶菊属：我国1种，广布" }
+        ]
+    },
+    "向日葵族q7": {
+        text: "",
+        options: [
+            { text: "7. 舌状花无或有短筒部，宿存于瘦果上而随瘦果脱落；头状花序有异形小花；叶对生稀上部互生。", next: "向日葵族q8", img: "persistent_ligule.jpg", note: "" },
+            { text: "7. 舌状花不宿存于瘦果上；头状花序有异形花，辐射状或近盘状，舌状花结果实或无性，或仅有同形的两性花。", next: "向日葵族q9", img: "", note: "" }
+        ]
+    },
+    "向日葵族q8": {
+        text: "",
+        options: [
+            { text: "8. 花托圆锥状或圆柱状；至少内部瘦果有1—3芒；总苞片3至多层，覆瓦状排列。", next: "result_zinnia", img: "zinnia.jpg", note: "百日菊属：常见观赏花卉" },
+            { text: "8. 花托稍平；瘦果无芒或有1—2短芒；总苞片2—3层，稍不等长。", next: "result_sanvitalia", img: "", note: "蛇目菊属：常见栽培" }
+        ]
+    },
+    "向日葵族q9": {
+        text: "",
+        options: [
+            { text: "9. 冠毛不存在或为带状或具倒刺的芒，或小鳞片状。", next: "向日葵族q10", img: "pappus_awns.jpg", note: "" },
+            { text: "9. 冠毛有多数分离，带状，缨状，羽状大鳞片或芒；瘦果圆柱状或有棱；草本，叶对生。", next: "向日葵族q24", img: "", note: "" }
+        ]
+    },
+    "向日葵族q10": {
+        text: "",
+        options: [
+            { text: "10. 瘦果全部肥厚，圆柱形，或舌状花瘦果有3棱，筒状花瘦果侧面扁压；草本。", next: "向日葵族q11", img: "", note: "" },
+            { text: "10. 瘦果多少背面扁压。", next: "向日葵族q19", img: "achene_compressed.jpg", note: "注意瘦果扁平的方向" }
+        ]
+    },
+    "向日葵族q11": {
+        text: "",
+        options: [
+            { text: "11. 瘦果为内层总苞片（或外层托片）所包裹，无冠毛或有微鳞片；叶对生。", next: "向日葵族q12", img: "", note: "" },
+            { text: "11. 内层总苞片平，不包围瘦果。", next: "向日葵族q13", img: "", note: "" }
+        ]
+    },
+    "向日葵族q12": {
+        text: "",
+        options: [
+            { text: "12. 雌花1层；外层总苞片5，开展，头状花序圆锥状排列，有花序梗。", next: "result_siegesbeckia", img: "siegesbeckia.jpg", note: "豨莶属：我国3种，广布" },
+            { text: "12. 雌花多层；总苞片4，宽大，排列成2对，头状花序腋生，几无花序梗。", next: "result_enhydra", img: "", note: "沼菊属：我国1种，产广东" }
+        ]
+    },
+    "向日葵族q13": {
+        text: "",
+        options: [
+            { text: "13. 托片平，狭长；舌片小，近2层；无冠毛或有2短芒；叶对生。", next: "result_eclipta", img: "eclipta_prostrata.jpg", note: "鳢肠属：即旱莲草，我国1种，广布" },
+            { text: "13. 托片内凹或对褶，多少包裹小花。", next: "向日葵族q14", img: "", note: "" }
+        ]
+    },
+    "向日葵族q14": {
+        text: "",
+        options: [
+            { text: "14. 两性花的瘦果有4—5棱，或侧面扁压。", next: "向日葵族q15", img: "", note: "" },
+            { text: "14. 两性花的瘦果有锐或翅状的棱或背面扁压；冠毛有2—3细芒或无冠毛；叶对生。", next: "result_spilanthes", img: "", note: "金钮扣属：我国2种，产华南、西南" }
+        ]
+    },
+    "向日葵族q15": {
+        text: "",
+        options: [
+            { text: "15. 冠毛鳞片状，刺状，芒状，或不存在；花托平或稍凸起。", next: "向日葵族q16", img: "pappus_various.jpg", note: "" },
+            { text: "15. 冠毛不存在或有鳞片状，匙毛状，或有1—2凋落的短芒；头状花序有花序梗。", next: "result_wedelia", img: "wedelia.jpg", note: "蟛蜞菊属：我国10余种" }
+        ]
+    },
+    "向日葵族q16": {
+        text: "",
+        options: [
+            { text: "16. 头状花序有结果实的舌状花。", next: "向日葵族q17", img: "", note: "" },
+            { text: "16. 头状花序有不育或无性的舌状花。", next: "向日葵族q18", img: "", note: "" }
+        ]
+    },
+    "向日葵族q17": {
+        text: "",
+        options: [
+            { text: "17. 冠毛2—5宿存不等长的芒，基部结合成环状或杯状；头状花序小。", next: "result_blainvillea", img: "", note: "异芒菊属：我国1种，产华南、西南" },
+            { text: "17. 冠毛不存在或为鳞片状、匙毛状，或有1—2凋落的短芒，基部结合成环状或杯状；头状花序有花序梗。", next: "result_wedelia_dup", img: "", note: "同上，蟛蜞菊属" }
+        ]
+    },
+    "向日葵族q18": {
+        text: "",
+        options: [
+            { text: "18. 冠毛有凋落或宿存的小鳞片；头状花序大，花序梗棒锤状。", next: "result_tithonia", img: "tithonia.jpg", note: "肿柄菊属：常见归化植物，花大黄色" },
+            { text: "18. 冠毛有凋落的芒，无宿存的鳞片；头状花序大，花序梗非棒锤状。", next: "result_helianthus", img: "sunflower.jpg", note: "向日葵属：包括向日葵、菊芋等" }
+        ]
+    },
+    "向日葵族q19": {
+        text: "",
+        options: [
+            { text: "19. 冠毛为宿存尖锐而具倒刺的芒；叶对生或上部互生。", next: "向日葵族q22", img: "bidens_seeds.jpg", note: "典型的“粘人”瘦果，具倒刺" },
+            { text: "19. 冠毛鳞片状，或芒状而无倒刺，或无冠毛；叶对生。", next: "向日葵族q20", img: "", note: "" }
+        ]
+    },
+    "向日葵族q20": {
+        text: "",
+        options: [
+            { text: "20. 总苞片分离，外层草质，几乎等长，内层较短，与托片同形；瘦果边缘有撕裂状的翅，翅端有2芒。", next: "result_synedrella", img: "", note: "金腰箭属：我国1种，产华南" },
+            { text: "20. 总苞片2层，外层小，内层膜质，几等长，基部或下部结合；冠毛有2—4芒或鳞片，或无冠毛。", next: "向日葵族q21", img: "", note: "" }
+        ]
+    },
+    "向日葵族q21": {
+        text: "",
+        options: [
+            { text: "21. 花柱分枝顶端笔状或截形，有或无短附器；瘦果边缘有翅或有睫毛，或无，有2短芒或上端有毛或无冠毛；舌状花黄色。", next: "result_coreopsis", img: "coreopsis.jpg", note: "金鸡菊属：常用园林花卉" },
+            { text: "21. 花柱分枝顶端有具毛的长附器；瘦果无翅，无冠毛；舌状花白色、红色或紫色。", next: "result_dahlia", img: "dahlia.jpg", note: "大丽花属：常见栽培" }
+        ]
+    },
+    "向日葵族q22": {
+        text: "",
+        options: [
+            { text: "22. 花柱分枝有短附器；瘦果有2—4芒。", next: "向日葵族q23", img: "", note: "" },
+            { text: "22. 花柱分枝有长条形附器；瘦果有2芒。", next: "result_glossogyne", img: "", note: "香茹属：我国1种，产华南" }
+        ]
+    },
+    "向日葵族q23": {
+        text: "",
+        options: [
+            { text: "23. 果上端有喙，舌状花红色、紫色。", next: "result_cosmos", img: "cosmos.jpg", note: "秋英属：如波斯菊" },
+            { text: "23. 果上部狭窄，无喙，舌状花黄色、白色，或不存在。", next: "result_bidens", img: "bidens_flower.jpg", note: "鬼针草属：广布，极常见" }
+        ]
+    },
+    "向日葵族q24": {
+        text: "",
+        options: [
+            { text: "24. 冠毛的鳞片全缘或缝形，全部或一部分有短芒；总苞片1—2层，4—5个，薄质。", next: "result_galinsoga", img: "", note: "牛膝菊属：我国1种，产西南及西部" },
+            { text: "24. 冠毛的鳞片羽状，有长芒；总苞片2层，膜质，外层草质。", next: "result_tridax", img: "", note: "羽芒菊属：我国1种，产华南" }
+        ]
+    },
+
+    // --- 向日葵族 结果节点 ---
+    "result_shearardia": { result: "64. 虾须草属 Shearardia S. Moore", info: "特征：一年生小草本，果有3锐棱。" },
+    "result_adenocaulon_v": { result: "详见 61. 腺梗菜属 Adenocaulon Hook.", info: "归属于旋覆花族附近，但在某些系统中亦在此检索。" },
+    "result_xanthium": { result: "65. 苍耳属 Xanthium L.", info: "特征：总苞具钩刺，2室各含1花，果实随动物传播。" },
+    "result_ambrosia": { result: "66. 豚草属 Ambrosia L.", info: "特征：雌雄同株但头状花序单性，总苞有1列钩刺或瘤。" },
+    "result_acanthospermum": { result: "67. 刺苞果属 Acanthospermum Schrank", info: "特征：瘦果包藏在具钩刺的内层总苞片内。" },
+    "result_parthenium": { result: "68. 银胶菊属 Parthenium L.", info: "特征：瘦果背面扁压，由内层总苞片包裹。" },
+    "result_zinnia": { result: "69. 百日菊属 Zinnia L.", info: "特征：舌状花宿存，花托圆锥状，总苞覆瓦状。" },
+    "result_sanvitalia": { result: "70. 蛇目菊属 Sanvitalia Gualt. ex Eam.", info: "特征：舌状花宿存，花托稍平。" },
+    "result_siegesbeckia": { result: "71. 豨莶属 Siegesbeckia L.", info: "特征：外层总苞片5，开展具腺毛，极粘。" },
+    "result_enhydra": { result: "72. 沼菊属 Enhydra Lour.", info: "特征：水生或湿生，总苞片4片对生。" },
+    "result_eclipta": { result: "73. 鳢肠属 Eclipta L.", info: "特征：托片狭披针形，舌状花白色，极小。" },
+    "result_spilanthes": { result: "79. 金钮扣属 Spilanthes Jacq.", info: "特征：头状花序卵形或圆柱形，味辛辣（麻感）。" },
+    "result_wedelia": { result: "76. 蟛蜞菊属 Wedelia Jacq.", info: "特征：常匍匐，冠毛环状或杯状。" },
+    "result_wedelia_dup": { result: "76. 蟛蜞菊属 Wedelia Jacq.", info: "特征：同上。" },
+    "result_blainvillea": { result: "75. 异芒菊属 Blainvillea Cass.", info: "特征：冠毛芒宿存，基部结合。" },
+    "result_tithonia": { result: "77. 肿柄菊属 Tithonia Desf. ex Juss.", info: "特征：花序梗顶端膨大，花大，酷似向日葵。" },
+    "result_helianthus": { result: "78. 向日葵属 Helianthus L.", info: "特征：瘦果扁压，冠毛为2个极易脱落的芒。" },
+    "result_synedrella": { result: "80. 金腰箭属 Synedrella Gaertn.", info: "特征：瘦果边缘具撕裂状宽翅。" },
+    "result_coreopsis": { result: "81. 金鸡菊属 Coreopsis L.", info: "特征：内层总苞片基部合生，瘦果常具翅。" },
+    "result_dahlia": { result: "82. 大丽花属 Dahlia Cav.", info: "特征：块根植物，舌状花色彩丰富。" },
+    "result_glossogyne": { result: "85. 香茹属 Glossogyne Cass.", info: "特征：花柱分枝具长条形附器。" },
+    "result_cosmos": { result: "83. 秋英属 Cosmos Cav.", info: "特征：瘦果具长喙，芒具倒刺。" },
+    "result_bidens": { result: "84. 鬼针草属 Bidens L.", info: "特征：瘦果具宿存的倒刺芒，以此附着传播。" },
+    "result_galinsoga": { result: "86. 牛膝菊属 Galinsoga Ruiz et cav.", info: "特征：冠毛鳞片状，边缘具缝毛。" },
+    "result_tridax": { result: "87. 羽芒菊属 Tridax L.", info: "特征：冠毛鳞片羽状，具长芒。" },
+    // --- VI. 堆心菊族 Helenieae 检索逻辑 ---
+    "堆心菊族": {
+        text: "VI. 堆心菊族 Helenieae 检索表",
+        options: [
+            { text: "1. 总苞片1层, 常结合, 等长; 冠毛有具5—6芒的鳞片; 叶对生。", next: "result_tagetes", img: "tagetes.jpg", note: "万寿菊属：常见观赏花卉，具强烈的特殊气味" },
+            { text: "1. 总苞片1—2或少数层, 分离; 花托凸起, 球形或近卵形; 叶互生。", next: "堆心菊族q2", img: "", note: "" }
+        ]
+    },
+    "堆心菊族q2": {
+        text: "",
+        options: [
+            { text: "2. 花序托无托片; 叶基部下延; 冠毛有5—8鳞片。", next: "result_helenium", img: "helenium.jpg", note: "堆心菊属：栽培，美洲原产" },
+            { text: "2. 花序托多少有毛或有缝形膜片; 叶基部不下延; 冠毛有5—10芒状鳞片。", next: "result_gaillardia", img: "gaillardia.jpg", note: "天人菊属：常见栽培，花瓣常具双色" }
+        ]
+    },
+
+    // --- 堆心菊族 结果节点 ---
+    "result_tagetes": { 
+        result: "88. 万寿菊属 Tagetes L.", 
+        info: "特征：总苞片结合成筒状，叶对生，具油腺点。我国常见栽培及归化1种（如万寿菊、孔雀草）。" 
+    },
+    "result_helenium": { 
+        result: "89. 堆心菊属 Helenium L.", 
+        info: "特征：花托球形，无托片，叶基部常下延成翅。常见栽培供观赏。" 
+    },
+    "result_gaillardia": { 
+        result: "90. 天人菊属 Gaillardia Fouger", 
+        info: "特征：花托具毛，冠毛鳞片顶端具长芒。我国常见栽培及归化1种。" 
+    },
+    // --- VII. 春黄菊族 Anthemideae 检索逻辑 ---
+    "春黄菊族": {
+        text: "VII. 春黄菊族 Anthemideae 检索表",
+        options: [
+            { text: "1. 花序托有托片；头状花序通常辐射状，有舌状花。", next: "春黄菊族q2", img: "receptacle_palea.jpg", note: "" },
+            { text: "1. 花序托无托片，或仅具有线形边缘的小窝，或有时具托毛。", next: "春黄菊族q5", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q2": {
+        text: "",
+        options: [
+            { text: "2. 瘦果有4—5棱或多数纵肋，倒锥形；总苞半球形；头状花序有长柄。", next: "result_anthemis", img: "", note: "春黄菊属" },
+            { text: "2. 瘦果扁，有明显的边缘，矩圆形；总苞倒卵形或钟形；头状花序有短柄，多数排列成伞房状。", next: "春黄菊族q3", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q3": {
+        text: "",
+        options: [
+            { text: "3. 头状花序有异形花，总苞片多层，外层较小。", next: "春黄菊族q4", img: "", note: "" },
+            { text: "3. 头状花序仅有同形的两性花；总苞片近1层；花全部筒状。", next: "result_handelia", img: "", note: "天山蓍属：我国1种，产新疆" }
+        ]
+    },
+    "春黄菊族q4": {
+        text: "",
+        options: [
+            { text: "4. 舌状花有短舌片或无舌片；筒状花扁筒状，总苞卵圆形或矩圆形，边缘非褐色。", next: "result_achillea", img: "achillea.jpg", note: "蓍属：我国5种，广布" },
+            { text: "4. 舌状花有较长的舌片；筒状花扁筒状，总苞卵圆形或矩圆形，边缘边缘褐色。", next: "result_ptarmica", img: "", note: "长舌蓍属：我国10种" }
+        ]
+    },
+    "春黄菊族q5": {
+        text: "",
+        options: [
+            { text: "5. 头状花序单生或排列成伞房状或头状，或有时单生于叶腋而形似总状。", next: "春黄菊族q6", img: "", note: "" },
+            { text: "5. 头状花序排列成总状、复总状或簇生的伞房状或总状花序。", next: "春黄菊族q25", img: "artemisia_inflorescence.jpg", note: "进入蒿属及近缘属分支" }
+        ]
+    },
+    "春黄菊族q6": {
+        text: "",
+        options: [
+            { text: "6. 雌花1层或不存在，有舌片或仅有少数齿；两性花花冠通常有五齿。", next: "春黄菊族q7", img: "", note: "" },
+            { text: "6. 雌花2至多层，或有时1至多层（山芫荽属），头状花序盘状。", next: "春黄菊族q22", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q7": {
+        text: "",
+        options: [
+            { text: "7. 花序托圆锥形或矩圆形；瘦果腹面有3—5纵肋，背面凸或平；冠毛冠状、环状或不存在。", next: "春黄菊族q8", img: "", note: "" },
+            { text: "7. 花序托半球形或平。", next: "春黄菊族q9", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q8": {
+        text: "",
+        options: [
+            { text: "8. 头状花序有同形花，花冠5齿；花柱长锥形。", next: "result_matricaria", img: "", note: "母菊属" },
+            { text: "8. 头状花序有异形花，边缘舌状，圆锥形；两性花花冠5齿。", next: "result_tripleurospermum", img: "", note: "三肋果属" }
+        ]
+    },
+    "春黄菊族q9": {
+        text: "",
+        options: [
+            { text: "9. 冠毛长，芒状；头状花序有舌状花。", next: "春黄菊族q10", img: "", note: "" },
+            { text: "9. 冠毛非芒状，或无冠毛。", next: "春黄菊族q11", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q10": {
+        text: "",
+        options: [
+            { text: "10. 冠毛有多数弯曲或硬直的扁芒；舌状花不结果实；瘦果有5角棱。", next: "result_waldheimia", img: "", note: "唐古菊属：产西藏、青海" },
+            { text: "10. 冠毛有5长芒及多数短芒；瘦果平滑，有毛；花序托具缝边状小窝。", next: "result_formania", img: "", note: "复芒菊属：我国1种，产云南" }
+        ]
+    },
+    "春黄菊族q11": {
+        text: "",
+        options: [
+            { text: "11. 冠毛为5—8个钝或尖或具3齿的膜片；头状花序盘状。", next: "result_cancrinia", img: "", note: "小甘菊属" },
+            { text: "11. 冠毛不存在，或短冠状，或有短鳞片。", next: "春黄菊族q12", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q12": {
+        text: "",
+        options: [
+            { text: "12. 两性花不结果实，雌花结果实；瘦果扁压。", next: "result_filifolium", img: "", note: "线叶菊属：产华北、东北" },
+            { text: "12. 两性花结果实；瘦果有4—10纵肋。", next: "春黄菊族q13", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q13": {
+        text: "",
+        options: [
+            { text: "13. 一年生草本，舌状花的瘦果三棱形。", next: "result_chrysanthemum", img: "chrysanthemum_coronarium.jpg", note: "茼蒿属" },
+            { text: "13. 多年生草本或半灌木。", next: "春黄菊族q14", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q14": {
+        text: "",
+        options: [
+            { text: "14. 头状花序有舌状花。", next: "春黄菊族q15", img: "", note: "" },
+            { text: "14. 头状花序无舌状花。", next: "春黄菊族q20", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q15": {
+        text: "",
+        options: [
+            { text: "15. 舌状花白色。", next: "春黄菊族q16", img: "", note: "" },
+            { text: "15. 舌状花黄色、粉红色或红色。", next: "春黄菊族q18", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q16": {
+        text: "",
+        options: [
+            { text: "16. 舌状花瘦果三棱形，有冠状冠毛。", next: "result_argyranthemum", img: "", note: "木茼蒿属" },
+            { text: "16. 瘦果无冠毛。", next: "春黄菊族q17", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q17": {
+        text: "",
+        options: [
+            { text: "17. 瘦果三棱形。", next: "result_leucanthemum", img: "", note: "滨菊属" },
+            { text: "17. 瘦果圆柱形，有10纵肋。", next: "result_leucanthemella", img: "", note: "小白菊属" }
+        ]
+    },
+    "春黄菊族q18": {
+        text: "",
+        options: [
+            { text: "18. 瘦果无冠毛。", next: "春黄菊族q19", img: "", note: "" },
+            { text: "18. 瘦果有5—10纵肋，顶端有冠状冠毛。", next: "result_pyrethrum", img: "", note: "小黄菊属" }
+        ]
+    },
+    "春黄菊族q19": {
+        text: "",
+        options: [
+            { text: "19. 舌状花舌片近圆形；瘦果三棱形。", next: "result_brachanthemum", img: "", note: "短舌菊属" },
+            { text: "19. 舌状花舌片长，瘦果有多数纵肋。", next: "result_dendranthema", img: "dendranthema.jpg", note: "菊属：包括现代栽培的大多数菊花" }
+        ]
+    },
+    "春黄菊族q20": {
+        text: "",
+        options: [
+            { text: "20. 瘦果顶端截形，冠状，有齿或短裂片。", next: "result_tanacetum", img: "", note: "菊蒿属" },
+            { text: "20. 瘦果无冠毛或仅冠毛稍发育。", next: "春黄菊族q21", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q21": {
+        text: "",
+        options: [
+            { text: "21. 花全部两性。", next: "result_hippolytia", img: "", note: "女蒿属" },
+            { text: "21. 头状花序中央有两性花，周围有雌花，都结果实。", next: "result_ajania", img: "", note: "亚菊属" }
+        ]
+    },
+    "春黄菊族q22": {
+        text: "",
+        options: [
+            { text: "22. 总苞片1—2层，少有3层，近等长。", next: "春黄菊族q23", img: "", note: "" },
+            { text: "22. 总苞片3—4层，覆瓦状排列；瘦果圆柱形，有纵肋。", next: "result_sphaeromorphaea", img: "", note: "球菊属" }
+        ]
+    },
+    "春黄菊族q23": {
+        text: "",
+        options: [
+            { text: "23. 头状花序有柄；雌花无花冠或有筒状花冠。", next: "result_cotula", img: "", note: "山芫荽属" },
+            { text: "23. 头状花序无柄；雌花多层。", next: "春黄菊族q24", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q24": {
+        text: "",
+        options: [
+            { text: "24. 雌花无花冠，花药上端有附片；瘦果扁压，有厚翅。", next: "result_soliva", img: "", note: "裸柱菊属" },
+            { text: "24. 雌花有筒状花冠，花药上端无附片；瘦果不扁压。", next: "result_centipeda", img: "centipeda.jpg", note: "石胡荽属：常见野草，揉碎有辛辣味" }
+        ]
+    },
+    "春黄菊族q25": {
+        text: "",
+        options: [
+            { text: "25. 花冠上部被星状毛；瘦果多角形。", next: "result_kaschgaria", img: "", note: "喀什菊属" },
+            { text: "25. 花冠无星状毛；头状花序排列成总状或复总状。", next: "春黄菊族q26", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q26": {
+        text: "",
+        options: [
+            { text: "26. 头状花序大，直立，果有5棱。", next: "result_crossostephium", img: "", note: "芙蓉菊属" },
+            { text: "26. 头状花序小，直立或下垂；瘦果有2棱或细肋。", next: "春黄菊族q27", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q27": {
+        text: "",
+        options: [
+            { text: "27. 果近纺锤形，有沟及纵肋；花冠高脚杯状。", next: "result_stilpnolepis", img: "", note: "百花蒿属" },
+            { text: "27. 果矩圆形或卵圆形；花冠筒状。", next: "春黄菊族q28", img: "", note: "" }
+        ]
+    },
+    "春黄菊族q28": {
+        text: "",
+        options: [
+            { text: "28. 雌花花冠截形，全缘；花药顶端附片圆菱形。", next: "result_neopallasia", img: "", note: "栉叶蒿属" },
+            { text: "28. 雌花花冠有裂片；花药顶端附片钝或钻状；瘦果在圆形花托上满布。", next: "result_artemisia", img: "artemisia.jpg", note: "蒿属：极其庞大，约200余种" }
+        ]
+    },
+
+    // --- 春黄菊族 结果节点 ---
+    "result_anthemis": { result: "91. 春黄菊属 Anthemis L.", info: "特征：花序托有托片，瘦果倒锥形，有4-5棱。" },
+    "result_handelia": { result: "94. 天山蓍属 Handelia Heimerl", info: "特征：总苞片1层，花全部筒状。" },
+    "result_achillea": { result: "92. 蓍属 Achillea L.", info: "特征：头状花序小，排列成伞房状，舌片短。" },
+    "result_ptarmica": { result: "93. 长舌蓍属 Ptarmica DC.", info: "特征：舌片较长，总苞边缘通常褐色。" },
+    "result_matricaria": { result: "95. 母菊属 Matricaria L.", info: "特征：花序托圆锥形，高凸。" },
+    "result_tripleurospermum": { result: "96. 三肋果属 Tripleurospermum Sch. Bip.", info: "特征：瘦果腹面有3条明显的白肋。" },
+    "result_waldheimia": { result: "97. 唐古菊属 Waldheimia Kar. et Kir.", info: "特征：高山植物，冠毛为扭曲的扁芒。" },
+    "result_formania": { result: "98. 复芒菊属 Formania W. W. Smith et Small", info: "特征：我国特有属，冠毛异形。" },
+    "result_cancrinia": { result: "99. 小甘菊属 Cancrinia Kar. et Kir.", info: "特征：冠毛为膜质鳞片。" },
+    "result_filifolium": { result: "100. 线叶菊属 Filifolium Kitam.", info: "特征：叶丝状分裂，两性花不育。" },
+    "result_chrysanthemum": { result: "101. 茼蒿属 Chrysanthemum L.", info: "特征：一年生，瘦果异形（舌状花具三棱）。" },
+    "result_argyranthemum": { result: "102. 木茼蒿属 Argyranthemum Webb ex Sch.-Bip.", info: "特征：灌木状，白色舌状花。" },
+    "result_leucanthemum": { result: "103. 滨菊属 Leucanthemum Mill.", info: "特征：著名的观赏花卉“大滨菊”所在属。" },
+    "result_leucanthemella": { result: "104. 小白菊属 Leucanthemella Tzvelev", info: "特征：瘦果圆柱形，具10肋，无冠毛。" },
+    "result_pyrethrum": { result: "107. 小黄菊属 Pyrethrum Zinn.", info: "特征：包含除虫菊等重要经济植物。" },
+    "result_brachanthemum": { result: "105. 短舌菊属 Brachanthemum DC.", info: "特征：舌片极短，近圆形。" },
+    "result_dendranthema": { result: "106. 菊属 Dendranthema (DC.) Des Moul.", info: "特征：包含传统名花——菊花。" },
+    "result_tanacetum": { result: "108. 菊蒿属 Tanacetum L.", info: "特征：瘦果顶端有明显的冠状冠毛。" },
+    "result_hippolytia": { result: "109. 女蒿属 Hippolytia Poljak.", info: "特征：全部为两性筒状花。" },
+    "result_ajania": { result: "110. 亚菊属 Ajania Poljak.", info: "特征：中央两性，边缘雌性，无舌状花。" },
+    "result_sphaeromorphaea": { result: "114. 球菊属 Sphaeromorphaea DC.", info: "特征：头状花序近球形，无柄。" },
+    "result_cotula": { result: "111. 山芫荽属 Cotula L.", info: "特征：雌花无花冠或呈膜质。" },
+    "result_soliva": { result: "112. 裸柱菊属 Soliva Ruiz et Pav.", info: "特征：归化植物，瘦果具厚翅，顶端有关节状宿存花柱。" },
+    "result_centipeda": { result: "113. 石胡荽属 Centipeda Lour.", info: "特征：极常见，药名“鹅不食草”。" },
+    "result_kaschgaria": { result: "115. 喀什菊属 Kaschgaria Poljak.", info: "特征：花冠密被星状毛。" },
+    "result_crossostephium": { result: "116. 芙蓉菊属 Crossostephium Less.", info: "特征：常具白毛，银灰色，庭园常用。" },
+    "result_stilpnolepis": { result: "117. 百花蒿属 Stilpnolepis J. M. Krasch.", info: "特征：花冠高脚杯状。" },
+    "result_neopallasia": { result: "118. 栉叶蒿属 Neopallasia Poljak.", info: "特征：叶栉齿状分裂。" },
+    "result_artemisia": { result: "119. 蒿属 Artemisia L.", info: "特征：庞大的属，花序极小，风媒传粉。包含艾、青蒿等。" },
+    // --- VIII. 千里光族 Senecioneae 检索逻辑 ---
+    "千里光族": {
+        text: "VIII. 千里光族 Senecioneae 检索表",
+        options: [
+            { text: "1. 总苞片1层, 基部无外苞片; 雄蕊花药基部钝; 叶互生。", next: "千里光族q2", img: "involucre_1layer.jpg", note: "" },
+            { text: "1. 总苞片1层, 基部有数个较小的外苞片（副总苞）; 或总苞片多层, 覆瓦状排列。", next: "千里光族q4", img: "calyculus.jpg", note: "注意主总苞下方是否有几片极小的针状或叶状苞片" }
+        ]
+    },
+    "千里光族q2": {
+        text: "",
+        options: [
+            { text: "2. 头状花序盘状，无舌状花，花冠紫色或红色；瘦果有5棱。", next: "result_emilia", img: "emilia.jpg", note: "一点红属：常见野草，花序如红缨" },
+            { text: "2. 头状花序辐射状，有舌状花，或盘状而花冠黄色。", next: "千里光族q3", img: "", note: "" }
+        ]
+    },
+    "千里光族q3": {
+        text: "",
+        options: [
+            { text: "3. 花柱分枝顶端有长钻形附片；瘦果圆柱形。", next: "result_gynura", img: "gynura.jpg", note: "菊三七属：如红凤菜、白凤菜" },
+            { text: "3. 花柱分枝顶端截形或钝，有短毛；瘦果扁或有棱。", next: "result_cissampelopsis", img: "", note: "藤菊属：常攀援" }
+        ]
+    },
+    "千里光族q4": {
+        text: "",
+        options: [
+            { text: "4. 总苞片多层，覆瓦状排列；叶在基部丛生，先叶开花。", next: "千里光族q5", img: "", note: "" },
+            { text: "4. 总苞片1层（主总苞），基部常有副总苞；叶生于茎上，开花时长叶。", next: "千里光族q6", img: "", note: "" }
+        ]
+    },
+    "千里光族q5": {
+        text: "",
+        options: [
+            { text: "5. 雌花多层，丝状，中央为两性花；花冠黄色。", next: "result_petasites", img: "", note: "蜂斗菜属：春季最早开花的植物之一" },
+            { text: "5. 雌花1层，舌状，白色或黄色；花冠大型。", next: "result_tussilago", img: "tussilago.jpg", note: "款冬属：名药款冬花，冬末春初先花后叶" }
+        ]
+    },
+    "千里光族q6": {
+        text: "",
+        options: [
+            { text: "6. 花序托有托片；舌状花黄色，瘦果有多数肋。", next: "result_ligularia_part", img: "", note: "见橐吾属部分种" },
+            { text: "6. 花序托无托片。", next: "千里光族q7", img: "", note: "" }
+        ]
+    },
+    "千里光族q7": {
+        text: "",
+        options: [
+            { text: "7. 头状花序盘状，无舌状花。", next: "千里光族q8", img: "", note: "" },
+            { text: "7. 头状花序辐射状，有明显的舌状花。", next: "千里光族q11", img: "", note: "" }
+        ]
+    },
+    "千里光族q8": {
+        text: "",
+        options: [
+            { text: "8. 花冠紫色或红色，全部两性；总苞筒状。", next: "result_crassocephalum", img: "crassocephalum.jpg", note: "野茼蒿属：著名的救荒野草" },
+            { text: "8. 花冠黄色或橙色。", next: "千里光族q9", img: "", note: "" }
+        ]
+    },
+    "千里光族q9": {
+        text: "",
+        options: [
+            { text: "9. 茎叶肉质，常攀援；花柱分枝顶端有长附片。", next: "result_kleinia", img: "", note: "仙人笔属：多肉植物" },
+            { text: "9. 茎叶非肉质；直立草本。", next: "千里光族q10", img: "", note: "" }
+        ]
+    },
+    "千里光族q10": {
+        text: "",
+        options: [
+            { text: "10. 总苞基部有显著的外苞片；瘦果有纵肋。", next: "result_senecio_part", img: "", note: "千里光属（部分）" },
+            { text: "10. 总苞基部无或有极少外苞片；叶掌状分裂。", next: "result_cacalia", img: "", note: "蟹甲草属：多生于林下" }
+        ]
+    },
+    "千里光族q11": {
+        text: "",
+        options: [
+            { text: "11. 茎基部常有老叶残余的纤维；叶片通常很大；总苞片2层（外层覆盖内层）。", next: "result_ligularia", img: "ligularia.jpg", note: "橐吾属：高大草本，常见于湿润地" },
+            { text: "11. 茎基部无纤维；总苞片1层，基部有副总苞。", next: "千里光族q12", img: "", note: "" }
+        ]
+    },
+    "千里光族q12": {
+        text: "",
+        options: [
+            { text: "12. 舌状花白色；多年生草本，叶对生或互生。", next: "result_farfugium", img: "farfugium.jpg", note: "大吴风草属：园林常见，叶片肾形如荷叶" },
+            { text: "12. 舌状花黄色；叶互生。", next: "result_senecio", img: "senecio.jpg", note: "千里光属：中国约160余种，极庞大" }
+        ]
+    },
+
+    // --- 千里光族 结果节点 ---
+    "result_emilia": { result: "120. 一点红属 Emilia Cass.", info: "特征：总苞1层无副总苞，花紫色，叶常琴状分裂。" },
+    "result_gynura": { result: "121. 菊三七属 Gynura Cass.", info: "特征：花柱附片钻形，被毛。我国约10余种。" },
+    "result_cissampelopsis": { result: "122. 藤菊属 Cissampelopsis (DC.) Miq.", info: "特征：木质或半木质藤本，花黄色或白色。" },
+    "result_petasites": { result: "123. 蜂斗菜属 Petasites Mill.", info: "特征：雌雄异株，先花后叶，花序密集。" },
+    "result_tussilago": { result: "124. 款冬属 Tussilago L.", info: "特征：单头花序，先花后叶，药用植物。" },
+    "result_crassocephalum": { result: "125. 野茼蒿属 Crassocephalum Moench", info: "特征：总苞筒状，副总苞显著，花红色或紫红色。" },
+    "result_kleinia": { result: "126. 仙人笔属 Kleinia Mill.", info: "特征：多肉植物，总苞筒状，花柱附片锥状。" },
+    "result_cacalia": { result: "127. 蟹甲草属 Cacalia L.", info: "特征：总苞片5-8，小花5-15，叶多为掌状分裂。" },
+    "result_ligularia": { result: "128. 橐吾属 Ligularia Cass.", info: "特征：总苞片2层排列，瘦果常有纵肋，花序总状或伞房状。" },
+    "result_farfugium": { result: "129. 大吴风草属 Farfugium Lindl.", info: "特征：多年生常绿草本，叶革质，舌状花黄色。" },
+    "result_senecio": { result: "130. 千里光属 Senecio L.", info: "特征：世界性大属。总苞1层具副总苞，花柱顶端截形。" },
+    // --- IX. 金盏花族 Calenduleae 检索逻辑 ---
+    "金盏花族": {
+        text: "IX. 金盏花族 Calenduleae 检索表",
+        options: [
+            { 
+                text: "1. 瘦果环形或弯曲，无冠毛；总苞片1—2层，等长；草本，叶互生。", 
+                next: "result_calendula", 
+                img: "calendula_fruit.jpg", 
+                note: "金盏菊属：瘦果形态极特殊，呈指甲状或环状弯曲" 
+            }
+        ]
+    },
+
+    // --- XI. 菜蓟族 Cynareae 检索逻辑 ---
+    "菜蓟族": {
+        text: "XI. 菜蓟族 Cynareae 检索表",
+        options: [
+            { text: "1. 头状花序仅有同形的两性花（小花全为管状）。", next: "菜蓟族q2", img: "", note: "" },
+            { text: "1. 头状花序有异形小花；边缘小花无性，较大（如矢车菊），或雌性且不育。", next: "菜蓟族q21", img: "centaurea_flower.jpg", note: "" }
+        ]
+    },
+    "帚菊木族": {
+        text: "XII. 帚菊木族 Mutisieae 检索表",
+        options: [
+            { text: "1. 头状花序仅有同形的两性花；花冠全部为明显的二唇形（唇片2:3）；常为花葶单生头状花序。", next: "帚菊木族q2", img: "mutisieae_bilabiate.jpg", note: "观察花瓣是否呈现明显的上下唇分裂" },
+            { text: "1. 头状花序有异形小花；边缘小花雌性，舌状或二唇形，中央小花两性，管状或二唇形。", next: "帚菊木族q3", img: "", note: "" }
+        ]
+    },
+    
+    "菊苣族": {
+        text: "",
+        options: [
+            { text: "", next: "", img: "", note: "" },
+            { text: "", next: "", img: "", note: "" }
+        ]
+    },
+    "模板": {
+        text: "",
+        options: [
+            { text: "", next: "", img: "", note: "" },
+            { text: "", next: "", img: "", note: "" }
+        ]
+    },
+    
+
+    // --- 最终结果节点 (部分示例) ---
+    "result_astereae": { result: "III. 紫菀族 Astereae", info: "包含紫菀属、马兰属等。特征：花柱分枝有三角形附器。" },
+    
+};
+
+let history = ["菊科"];
+
+function render() {
+    const currentId = history[history.length - 1];
+    const node = treeData[currentId];
+    const app = document.getElementById('app');
+    const help = document.getElementById('help-content');
+
+    if (node.result) {
+        app.innerHTML = `<h2>结果：${node.result}</h2><p>${node.info}</p>`;
+        return;
+    }
+
+    let html = `<div class="question-box"><h3>${node.text}</h3>`;
+    node.options.forEach((opt, index) => {
+        html += `<button class="option-btn" onclick="choose('${opt.next}', '${opt.img}', '${opt.note}')">${opt.text}</button>`;
+    });
+    html += `</div>`;
+    app.innerHTML = html;
+}
+
+function choose(nextId, img, note) {
+    history.push(nextId);
+    showHelp(img, note);
+    render();
+}
+
+function showHelp(img, note) {
+    const help = document.getElementById('help-content');
+    help.innerHTML = `<p>${note}</p><img src="images/${img}" onerror="this.alt='[示意图: ${img}]'">`;
+}
+
+function goBack() {
+    if (history.length > 1) {
+        history.pop();
+        render();
+    }
+}
+
+render();
+</script>
+</body>
+</html>
