@@ -4,19 +4,45 @@
     <meta charset="UTF-8">
     <title>中国高等植物科属电子检索表</title>
     <style>
-        body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; }
+        :root {
+            --base-font-size: 16px;
+        }
+
+        body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; font-size: var(--base-font-size); /* 使用变量 */}
         /* 左侧检索区 */
         #left-panel { width: 45%; border-right: 2px solid #ccc; padding: 20px; overflow-y: auto; background: #f9f9f9; }
         /* 右侧辅助区 */
         #right-panel { width: 55%; padding: 20px; overflow-y: auto; background: white; }
         
         .question-box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .option-btn { display: block; width: 100%; padding: 12px; margin: 10px 0; text-align: left; 
-                      background: #e1f5fe; border: 1px solid #b3e5fc; cursor: pointer; border-radius: 4px; }
+        .option-btn { 
+            font-size: 1em; /* 继承父级字体大小 */
+            display: block; width: 100%; padding: 12px; margin: 10px 0; text-align: left; 
+            background: #e1f5fe; border: 1px solid #b3e5fc; cursor: pointer; border-radius: 4px; 
+        }
         .option-btn:hover { background: #b3e5fc; }
         .breadcrumb { font-size: 0.9em; color: #666; margin-bottom: 10px; }
         .term-help { color: #d32f2f; font-weight: bold; border-bottom: 1px dashed #d32f2f; cursor: help; }
         img { max-width: 100%; border-radius: 4px; margin-top: 10px; }
+        h3 { font-size: 1.2em; }
+        h2 { font-size: 1.5em; }
+
+        /* 控制面板样式 */
+        #font-ctrl {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        #font-ctrl button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -34,7 +60,12 @@
         <p>点击左侧特征中的红色词汇或选项，此处将显示相关示意图。</p>
     </div>
 </div>
-
+<div id="font-ctrl">
+    <span style="color:white; font-size: 14px; line-height: 24px;">字体:</span>
+    <button onclick="changeFontSize(-2)">A-</button>
+    <button onclick="changeFontSize(2)">A+</button>
+    <button onclick="resetFontSize()">重置</button>
+</div>
 <script>
 // --- 维护区：所有的检索逻辑都在这里修改 ---
 const treeData = {
@@ -1329,7 +1360,21 @@ function goBack() {
         render();
     }
 }
+let currentFontSize = 16;
 
+function changeFontSize(delta) {
+    currentFontSize += delta;
+    // 限制最小和最大字体，防止页面布局崩坏
+    if (currentFontSize < 12) currentFontSize = 12;
+    if (currentFontSize > 30) currentFontSize = 30;
+    
+    document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
+}
+
+function resetFontSize() {
+    currentFontSize = 16;
+    document.documentElement.style.setProperty('--base-font-size', '16px');
+}
 render();
 </script>
 </body>
